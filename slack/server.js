@@ -5,7 +5,7 @@ require('dotenv').load();
 
 const app = express();
 app.use(helmet())
-const port = process.env.PORT ||1000;
+const port = process.env.PORT ||3000;
 
 app.use("/", slackController)
 

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
+const db = require('./slack.db')
 require('dotenv').config();
 
 
@@ -38,7 +39,15 @@ router.get('/finishAuth', (req, res) => {
 });
 
 router.get('/getUsers', (req, res) => {
-  sc.users.list({}).then((userRes) =>{
+  sc.users.list({}).then( async (userRes) =>{
+    // try{
+    qRes = await db.executeQuery(db.queries.saveUsers, [JSON.stringify(userRes)])
+    // }
+    // catch(err){
+    //   let errMessage = 'Could not save users to db: ' + err;
+    //   console.error(errMessage);
+    // }
+    console.log(qRes)
     res.send(userRes);
   }).catch((err) =>{
     let errMessage = "Could not retrieve users: " + err;
@@ -46,5 +55,16 @@ router.get('/getUsers', (req, res) => {
     res.send(errMessage)
   })
 })
+
+router.get('/getChannelHistory', async (req, res) => {
+  let conv = await getChannelData();
+  res.send(conv);
+})
+
+const getChannelData = async () => {
+  let conversations = await sc.conversations.list();
+  console.log(JSON.stringify(conversations))
+  return conversations;
+}
 
 module.exports=router

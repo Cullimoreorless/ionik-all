@@ -10,6 +10,7 @@
       "name": "Launch Program",
       "program": "${workspaceFolder}/slack/server.js",
       "envFile": "${workspaceFolder}/slack/.env"
+      
     }
   ]
 }
