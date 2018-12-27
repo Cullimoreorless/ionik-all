@@ -62,8 +62,28 @@ router.get('/getChannelHistory', async (req, res) => {
 })
 
 const getChannelData = async () => {
-  let conversations = await sc.conversations.list();
-  console.log(JSON.stringify(conversations))
+  let conversations;
+  try{
+    conversations = await sc.conversations.list();
+    for(channel of conversations.channels){
+      let channelMembers = await sc.conversations.members({
+        channel:channel.id
+      });
+      
+      hasMoreMessages = true;
+      while(hasMoreMessages){
+        let conversationHistory = await sc.conversations.history({
+          channel: channel.id
+        });
+        db.executeQuery(db.queries.saveMessages, [channel.id, JSON.stringify(conversationHistory.messages)])
+        hasMoreMessages = conversationHistory.response_metadata.has_more
+      }
+    }
+  }
+  catch(err){
+    let errMessage = "Could not retrieve conversation history: " + err;
+    console.error(errMessage)
+  }
   return conversations;
 }
 
