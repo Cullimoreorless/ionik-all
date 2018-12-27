@@ -1,0 +1,25 @@
+{
+  "name": "ionik-slack",
+  "version": "1.0.0",
+  "description": "Slack App for Ionik data Gathering",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "Ionik",
+    "Slack",
+    "Integration",
+    "App",
+    "Data"
+  ],
+  "author": "Alex Cullimore",
+  "license": "ISC",
+  "dependencies": {
+    "@slack/client": "^4.8.0",
+    "dotenv": "^6.2.0",
+    "express": "^4.16.4",
+    "helmet": "^3.15.0"
+  }
+}
