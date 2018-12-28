@@ -8,10 +8,11 @@ const dbClient = new Pool({
 });
 
 const queries = {
-  saveUsers : "insert into stg.slack_users VALUES ($1)",
-  saveMessages : "insert into stg.slack_messages VALUES ($1,$2)",
-  saveChannelDetails : "insert into stg.slack_channels VALUES ($1,$2,$3)",
-  saveChannelMembers : "insert into stg.slack_channel_members VALUES ($1, $2)",
+  saveUsers : "insert into stg.slack_user (userdata, transactionuuid) VALUES ($1,$2)",
+  saveMessages : "insert into stg.slack_message (channelid, messagedata, transactionuuid) VALUES ($1,$2,$3)",
+  saveChannelDetails : "insert into stg.slack_channel (channelid, numberofmembers, transactionuuid) VALUES ($1,$2,$3)",
+  saveChannelMembers : "insert into stg.slack_channel_member (channelid, memberlist,transactionuuid) VALUES ($1, $2, $3)",
+  saveWorkspace: `insert into stg.slack_workspace (teamid, name, domain, transactionuuid)  VALUES ( $1,$2,$3,$4)`,
   getCompanyIdentifier: "select * from company_identifiers where systemid = $1",
   insertCompanyIdentifier:"insert into company_identifiers VALUES (1,1,$1,$2, now())",
   updateCompanyIdentifier:`update company_identifiers 
