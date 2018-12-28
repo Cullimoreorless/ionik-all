@@ -70,3 +70,21 @@ create table company_identifier (
   lastretrievedutc timestamp, 
   foreign key (systemtypeid) references system_type(systemtypeid)
 );
+
+drop table if exists person_identifier;
+create table person_identifier
+(
+  personidentifierid bigserial primary key,
+  companyidentifierid int,
+  systemtypeid int,
+  systemid text,
+  systemname text,
+  systemrealname text,
+  systemtimezoneoffset int,
+  systemtimezonename text,
+  systemlocation text,
+  systemupdatetsutc timestamp,
+  isactive boolean,
+  foreign key (companyidentifierid) references company_identifier(companyidentifierid),
+  foreign key (systemtypeid) references system_type(systemtypeid)
+);
