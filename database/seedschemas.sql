@@ -54,11 +54,11 @@ drop table if exists system_type;
 create table system_type
 (
 	systemtypeid serial primary key,
-	systemname varchar(100)
+	systemtypedesc varchar(100)
 );
 
-insert into system_type (systemname) values ('Slack');
-insert into system_type (systemname) values ('Outlook Mail');
+insert into system_type (systemtypedesc) values ('Slack');
+insert into system_type (systemtypedesc) values ('Outlook Mail');
 
 drop table if exists company_identifier;
 create table company_identifier (
