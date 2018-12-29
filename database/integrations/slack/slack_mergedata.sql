@@ -198,3 +198,28 @@ join conversation conv
 	on conv.systemid = messages.channelid
 where not exists (select 1 from sent_message sm 
 where sm.systemid = messages.messageid);
+
+
+insert into message_info (messageid, senderid, recipientid, conversationid,
+	totalnumofrecipients, messagetsutc, sendertslocal, recipienttslocal,
+	sentoutofworkhours)
+select sm.messageid, sm.personidentifierid as senderid, 
+	cm.personidentifierid as recipientid, sm.conversationid,
+	count(cm.personidentifierid) over (partition by sm.messageid) as totalnumofrecipients,
+	sm.messagetsutc, messagetslocal as sendertslocal, 
+	sm.messagetsutc + recipient.systemtimezoneoffset::text::interval as recipienttslocal,
+	is_outside_work_hours(sm.messagetslocal) as sentoutofworkhours
+from sent_message sm 
+join conversation_member cm 
+	on cm.conversationid = sm.conversationid 
+		and sm.personidentifierid <> cm.personidentifierid
+--		and sm.messagetsutc between cm.createtsutc and coalesce(cm.endtsutc, '3099-01-01'::timestamp)
+join person_identifier sender
+	on sender.personidentifierid = sm.personidentifierid
+join person_identifier recipient
+	on recipient.personidentifierid = cm.personidentifierid
+where not exists (select 1 from message_info mi 
+where mi.conversationid = cm.conversationid 
+	and mi.senderid = sender.personidentifierid
+	and mi.recipientid = recipient.personidentifierid
+	and mi.messageid = sm.messageid);

@@ -117,7 +117,7 @@ create table conversation_member
 drop table if exists sent_message;
 create table sent_message
 (
-	messageid bigserial,
+	messageid bigserial primary key,
 	personidentifierid int,
 	conversationid bigint,
 	systemid text,
@@ -125,6 +125,35 @@ create table sent_message
 	messagetslocal timestamp,
 	createtsutc timestamp
 );
+
+drop table if exists message_info;
+create table message_info
+(
+  messageinfoid bigserial primary key,
+  messageid bigint,
+  senderid int,
+  recipientid int,
+  conversationid bigint,
+  totalnumofrecipients int,
+  messagetsutc timestamp,
+  sendertslocal timestamp,
+  recipienttslocal timestamp,
+  sentoutofworkhours boolean,
+  foreign key (messageid) references sent_message(messageid),
+  foreign key (senderid) references person_identifier(personidentifierid),
+  foreign key (recipientid) references person_identifier(personidentifierid),
+  foreign key (conversationid) references conversation(conversationid)
+);
+
+create or replace function public.is_outside_work_hours(ts timestamp) returns boolean as $$
+declare tsdecimaltime numeric = extract(hour from ts) + (extract(min from ts) / 60.000);
+declare tsdow numeric = extract(dow from ts);
+declare returnval boolean;
+begin
+returnval = case when tsdow in (0,6) or (tsdecimaltime < 8.5 or tsdecimaltime > 17.5) then true else false end;
+return returnval;
+end;
+$$ language plpgsql;
 
 --SCHEMA: graph
 
