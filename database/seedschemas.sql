@@ -114,4 +114,17 @@ create table conversation_member
 	foreign key (personidentifierid) references person_identifier(personidentifierid)
 );
 
+drop table if exists sent_message;
+create table sent_message
+(
+	messageid bigserial,
+	personidentifierid int,
+	conversationid bigint,
+	systemid text,
+	messagetsutc timestamp,
+	messagetslocal timestamp,
+	createtsutc timestamp
+);
+
+--SCHEMA: graph
 

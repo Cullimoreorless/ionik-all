@@ -130,6 +130,29 @@ join person_identifier pid
 where base.conversationid = conversation_member.conversationid
 	and base.personidentifierid = conversation_member.personidentifierid;
 
+
+update conversation_member 
+set isactive = false, updatetsutc = now() at time zone 'utc',
+	endtsutc = now() at time zone 'utc'
+from (
+select cm.* from conversation_member cm
+join conversation conv
+	on cm.conversationid = conv.conversationid
+join person_identifier pid 
+    on pid.personidentifierid = cm.personidentifierid
+    join 
+(select distinct channelid from stg.slack_channel_member) channelwithmembers
+  on conv.systemid = channelwithmembers.channelid
+left join (select channelid, replace(jsonb_array_elements(memberlist::jsonb)::text,'"','') as userid
+from stg.slack_channel_member) stgchannelmembers
+	on conv.systemid = stgchannelmembers.channelid
+		and pid.systemid = stgchannelmembers.userid
+where stgchannelmembers.userid is null and channelwithmembers.channelid is not null
+) base
+where base.conversationmemberid = conversation_member.conversationmemberid;
+
+
+
 insert into conversation_member (conversationid, personidentifierid, isactive, 
 	createtsutc, updatetsutc)	 
 select conv.conversationid, pid.personidentifierid, true as isactive,
@@ -152,3 +175,26 @@ join person_identifier pid
 where not exists (select 1 from conversation_member cm
 	where cm.conversationid = conv.conversationid 
 		and cm.personidentifierid = pid.personidentifierid);
+
+
+insert into sent_message (personidentifierid, conversationid, systemid, messagetsutc,messagetslocal, createtsutc)
+select pid.personidentifierid, conv.conversationid, messageid, messagetsutc,
+	messagetsutc + systemtimezoneoffset::text::interval,
+	now() at time zone 'utc'
+from (
+select channelid, 
+	to_timestamp(
+		split_part((messagejson#>>'{"ts"}')::text,'.',1)::int) at time zone 'utc' as messagetsutc,
+	(messagejson#>>'{"user"}')::text as userid,
+	(messagejson#>>'{"client_msg_id"}')::text as messageid,
+	messagejson 
+from (
+select channelid, jsonb_array_elements(messagedata::jsonb) as messagejson 
+from stg.slack_message) messagejson ) messages
+join person_identifier pid 
+	on messages.messageid is not null
+		and pid.systemid = messages.userid
+join conversation conv 
+	on conv.systemid = messages.channelid
+where not exists (select 1 from sent_message sm 
+where sm.systemid = messages.messageid);
