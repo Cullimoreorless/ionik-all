@@ -83,3 +83,72 @@ where (userdata::jsonb#>>'{"members"}') is not null ) base ) users
 on users.teamid = cid.systemid
 where not exists (select 1 from person_identifier pid
 where pid.systemid = users.systemid and cid.companyidentifierid = pid.companyidentifierid);
+
+
+
+update conversation
+set updatetsutc = now() at time zone 'utc'
+from (
+select distinct sc.channelid, cid.companyidentifierid from stg.slack_channel sc 
+join stg.slack_workspace sw 
+	on sw.transactionuuid = sc.transactionuuid
+join company_identifier cid 
+	on cid.systemid = sw.teamid) base
+where base.channelid = conversation.systemid
+	and base.companyidentifierid = conversation.companyidentifierid;
+
+insert into conversation (systemid, companyidentifierid, createtsutc, updatetsutc)
+select distinct sc.channelid, cid.companyidentifierid, 
+	now() at time zone 'utc' as createtsutc,  
+	now() at time zone 'utc' as updatetsutc
+from stg.slack_channel sc 
+join stg.slack_workspace sw 
+	on sw.transactionuuid = sc.transactionuuid
+join company_identifier cid 
+	on cid.systemid = sw.teamid;
+
+
+  update conversation_member
+set updatetsutc = now() at time zone 'utc',
+	isactive = true
+from (select conv.conversationid, pid.personidentifierid, true as isactive
+from  (
+	select sc.channelid, cid.companyidentifierid, 
+		replace(jsonb_array_elements(scm.memberlist::jsonb)::text,'"','') as userid
+	from stg.slack_channel sc 
+	join stg.slack_channel_member scm 
+		on scm.channelid = sc.channelid
+			and scm.transactionuuid = sc.transactionuuid
+	join stg.slack_workspace sw 
+		on sw.transactionuuid = sc.transactionuuid
+	join company_identifier cid 
+		on cid.systemid = sw.teamid) stgconv
+join conversation conv 
+	on conv.systemid = stgconv.channelid
+join person_identifier pid 
+	on pid.systemid = stgconv.userid) base
+where base.conversationid = conversation_member.conversationid
+	and base.personidentifierid = conversation_member.personidentifierid;
+
+insert into conversation_member (conversationid, personidentifierid, isactive, 
+	createtsutc, updatetsutc)	 
+select conv.conversationid, pid.personidentifierid, true as isactive,
+	now() at time zone 'utc',now() at time zone 'utc'
+from  (
+	select sc.channelid, cid.companyidentifierid, 
+		replace(jsonb_array_elements(scm.memberlist::jsonb)::text,'"','') as userid
+	from stg.slack_channel sc 
+	join stg.slack_channel_member scm 
+		on scm.channelid = sc.channelid
+			and scm.transactionuuid = sc.transactionuuid
+	join stg.slack_workspace sw 
+		on sw.transactionuuid = sc.transactionuuid
+	join company_identifier cid 
+		on cid.systemid = sw.teamid) stgconv
+join conversation conv 
+	on conv.systemid = stgconv.channelid
+join person_identifier pid 
+	on pid.systemid = stgconv.userid
+where not exists (select 1 from conversation_member cm
+	where cm.conversationid = conv.conversationid 
+		and cm.personidentifierid = pid.personidentifierid);

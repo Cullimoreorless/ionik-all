@@ -88,3 +88,30 @@ create table person_identifier
   foreign key (companyidentifierid) references company_identifier(companyidentifierid),
   foreign key (systemtypeid) references system_type(systemtypeid)
 );
+
+drop table if exists conversation;
+create table conversation
+(
+	conversationid bigserial primary key,
+	companyidentifierid int,
+	systemid text,
+	createtsutc timestamp,
+	updatetsutc timestamp,
+	foreign key (companyidentifierid) references company_identifier(companyidentifierid)
+);
+
+drop table if exists conversation_member;
+create table conversation_member
+(
+	conversationmemberid bigserial primary key,
+	conversationid bigint,
+	personidentifierid int,
+	isactive boolean,
+	createtsutc timestamp,
+	updatetsutc timestamp,
+	endtsutc timestamp,
+	foreign key (conversationid) references conversation(conversationid),
+	foreign key (personidentifierid) references person_identifier(personidentifierid)
+);
+
+
