@@ -1,0 +1,22 @@
+{
+  "name": "ionik-app",
+  "version": "1.0.0",
+  "description": "Ionik Web App",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "Ionik",
+    "Visualization",
+    "Data",
+    "App"
+  ],
+  "author": "Alex Cullimore",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4",
+    "helmet": "^3.15.0",
+    "pg": "^7.7.1"
+  }
+}

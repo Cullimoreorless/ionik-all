@@ -130,51 +130,50 @@ join person_identifier pid
 where base.conversationid = conversation_member.conversationid
 	and base.personidentifierid = conversation_member.personidentifierid;
 
+insert into conversation_member (conversationid, personidentifierid, isactive, createtsutc, updatetsutc)
+select conversationid, personidentifierid,true, tsutc, now() at time zone 'utc'  from (
+select channelid, msgjson#>>'{"user"}' as userid,
+	to_timestamp(
+		split_part((msgjson#>>'{"ts"}')::text,'.',1)::int) at time zone 'utc' as tsutc,
+	'join' as type
+from (
+select channelid, jsonb_array_elements(messagedata::jsonb) as msgjson
+from stg.slack_message ) jsonmessages
+where msgjson#>>'{"subtype"}' = 'channel_join') joins
+join person_identifier pid 
+	on pid.systemid = joins.userid
+join conversation conv
+	on conv.systemid = joins.channelid
+where not exists (select 1 from conversation_member cm 
+	where cm.conversationid = conv.conversationid 
+		and pid.personidentifierid = cm.personidentifierid
+		and cm.createtsutc = tsutc);
 
 update conversation_member 
-set isactive = false, updatetsutc = now() at time zone 'utc',
-	endtsutc = now() at time zone 'utc'
+set endtsutc = base.tsutc
 from (
-select cm.* from conversation_member cm
+select existingjoins.conversationmemberid, leaves.tsutc from 
+	(select channelid, msgjson#>>'{"user"}' as userid,
+	to_timestamp(
+		split_part((msgjson#>>'{"ts"}')::text,'.',1)::int) at time zone 'utc' as tsutc from (
+	select channelid, jsonb_array_elements(messagedata::jsonb) as msgjson
+	from stg.slack_message ) jsonmessages
+where msgjson#>>'{"subtype"}' = 'channel_leave') leaves
+join person_identifier pid 
+	on pid.systemid = leaves.userid
 join conversation conv
-	on cm.conversationid = conv.conversationid
-join person_identifier pid 
-    on pid.personidentifierid = cm.personidentifierid
-    join 
-(select distinct channelid from stg.slack_channel_member) channelwithmembers
-  on conv.systemid = channelwithmembers.channelid
-left join (select channelid, replace(jsonb_array_elements(memberlist::jsonb)::text,'"','') as userid
-from stg.slack_channel_member) stgchannelmembers
-	on conv.systemid = stgchannelmembers.channelid
-		and pid.systemid = stgchannelmembers.userid
-where stgchannelmembers.userid is null and channelwithmembers.channelid is not null
-) base
-where base.conversationmemberid = conversation_member.conversationmemberid;
-
-
-
-insert into conversation_member (conversationid, personidentifierid, isactive, 
-	createtsutc, updatetsutc)	 
-select conv.conversationid, pid.personidentifierid, true as isactive,
-	now() at time zone 'utc',now() at time zone 'utc'
-from  (
-	select sc.channelid, cid.companyidentifierid, 
-		replace(jsonb_array_elements(scm.memberlist::jsonb)::text,'"','') as userid
-	from stg.slack_channel sc 
-	join stg.slack_channel_member scm 
-		on scm.channelid = sc.channelid
-			and scm.transactionuuid = sc.transactionuuid
-	join stg.slack_workspace sw 
-		on sw.transactionuuid = sc.transactionuuid
-	join company_identifier cid 
-		on cid.systemid = sw.teamid) stgconv
-join conversation conv 
-	on conv.systemid = stgconv.channelid
-join person_identifier pid 
-	on pid.systemid = stgconv.userid
-where not exists (select 1 from conversation_member cm
-	where cm.conversationid = conv.conversationid 
-		and cm.personidentifierid = pid.personidentifierid);
+	on conv.systemid = leaves.channelid
+join (select conversationmemberid, conversationid, personidentifierid, createtsutc, 
+	coalesce(lead(createtsutc) over (partition by conversationid, personidentifierid order by createtsutc),
+		'3000-01-01'::timestamp) as nextjoins
+from conversation_member cm ) existingjoins
+	on existingjoins.conversationid = conv.conversationid
+		and existingjoins.personidentifierid = pid.personidentifierid
+		and leaves.tsutc between existingjoins.createtsutc and existingjoins.nextjoins
+where not exists (select 1 from conversation_member cm 
+	where cm.conversationmemberid = existingjoins.conversationmemberid 
+		and cm.endtsutc = leaves.tsutc)) base
+	where base.conversationmemberid = conversation_member.conversationmemberid;
 
 
 insert into sent_message (personidentifierid, conversationid, systemid, messagetsutc,messagetslocal, createtsutc)
@@ -213,7 +212,7 @@ from sent_message sm
 join conversation_member cm 
 	on cm.conversationid = sm.conversationid 
 		and sm.personidentifierid <> cm.personidentifierid
---		and sm.messagetsutc between cm.createtsutc and coalesce(cm.endtsutc, '3099-01-01'::timestamp)
+	and sm.messagetsutc between cm.createtsutc and coalesce(cm.endtsutc, '3099-01-01'::timestamp)
 join person_identifier sender
 	on sender.personidentifierid = sm.personidentifierid
 join person_identifier recipient
