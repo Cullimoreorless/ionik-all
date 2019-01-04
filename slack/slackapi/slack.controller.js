@@ -10,9 +10,6 @@ const sc = require('./slack.service');
 const client_id = process.env.SLACKCLIENTID;
 const client_secret = process.env.SLACKCLIENTSECRET;
 
-// const {WebClient} = require("@slack/client")
-// let sc = new WebClient("");
-
 
 router.get('/authorize',(req, res) => {
   scope = "channels:history channels:read groups:history team:read users:read";

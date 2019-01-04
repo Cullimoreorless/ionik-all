@@ -4,7 +4,8 @@
   "description": "Ionik Web App",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "start": "node server.js"
   },
   "keywords": [
     "Ionik",
@@ -15,8 +16,11 @@
   "author": "Alex Cullimore",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^6.2.0",
+    "ejs": "^2.6.1",
     "express": "^4.16.4",
     "helmet": "^3.15.0",
+    "path": "^0.12.7",
     "pg": "^7.7.1"
   }
 }

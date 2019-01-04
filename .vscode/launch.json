@@ -7,9 +7,17 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "Debug Slack App",
       "program": "${workspaceFolder}/slack/server.js",
       "envFile": "${workspaceFolder}/slack/.env"
+      
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Ionik App",
+      "program": "${workspaceFolder}/app/server.js",
+      "envFile": "${workspaceFolder}/app/.env"
       
     }
   ]
