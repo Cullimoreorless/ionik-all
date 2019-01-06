@@ -37,7 +37,10 @@ const queries = {
   from person_identifier) recipient
     on recipient.personidentifierid = msgs.recipientid
   where numberofinteractions >=3
-  order by sender.systemrealname) fields
+  union 
+  select 1, systemrealname, systemrealname, null, null, null 
+  from person_identifier pid where not exists (select 1
+  from message_info cm where senderid = pid.personidentifierid)) fields
   ) aggregated
   ) allrecs`
 };
