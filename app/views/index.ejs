@@ -63,8 +63,9 @@ $.ajax({url:"/molecule/getGraphData",
 
     // Compute the distinct nodes from the links.
     links.forEach(function(link) {
-      link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
-      link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
+      link.source = nodes[link.source] || (nodes[link.source] = {name: link.source, normalizedtotalinteractions:link.normalizedtotalinteractions});
+      let filtered = links.filter(l => (l.name || l.source.name) == link.target)[0];
+      link.target = nodes[link.target] || (nodes[link.target] = {name: link.target, normalizedtotalinteractions:(filtered ?filtered.normalizedtotalinteractions:5)});
     });
 
     var width = 960,
@@ -74,7 +75,7 @@ $.ajax({url:"/molecule/getGraphData",
         .nodes(d3.values(nodes))
         .links(links)
         .size([width, height])
-        .linkDistance(60)
+        .linkDistance(100)
         .charge(-300)
         .on("tick", tick)
         .start();
@@ -101,19 +102,20 @@ $.ajax({url:"/molecule/getGraphData",
         .data(force.links())
       .enter().append("path")
         .attr("class", function(d) { return "link " + d.type; })
+        .attr("style",function(d){return `stroke-width:${d.normalizedweight}px`})
         .attr("marker-end", function(d) { return "url(#" + d.type + ")"; });
 
     var circle = svg.append("g").selectAll("circle")
         .data(force.nodes())
       .enter().append("circle")
-        .attr("r", 6)
+        .attr("r", function(d) { return d.normalizedtotalinteractions;})
         .call(force.drag);
 
     var text = svg.append("g").selectAll("text")
         .data(force.nodes())
       .enter().append("text")
         .attr("x", 8)
-        .attr("y", ".31em")
+        .attr("y", ".35em")
         .text(function(d) { return d.name; });
 
     // Use elliptical arc path segments to doubly-encode directionality.

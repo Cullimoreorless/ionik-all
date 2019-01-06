@@ -8,21 +8,38 @@ const dbClient = new Pool({
 });
 
 const queries = {
-  getGraphData:`select json_agg(base) as graphlinks from (
-    select sender.systemrealname as source,
-      recipient.systemrealname as target,
-      numberofinteractions as weight
-    from (select senderid, recipientid, sum(1.00/totalnumofrecipients) as numberofinteractions
-    from message_info
-    group by senderid, recipientid) msgs 
-    join (
-    select personidentifierid, systemrealname
-    from person_identifier) sender
-      on sender.personidentifierid = msgs.senderid
-    join (
-    select personidentifierid, systemrealname 
-    from person_identifier) recipient
-      on recipient.personidentifierid = msgs.recipientid) base`
+  getGraphData:`select json_agg(allrecs) as graphlinks
+  from (select source, target, name,
+    round(normalize_and_scale(totalsentinteractions, mintotalinteractions, maxtotalinteractions, 6,16),2) normalizedtotalinteractions,
+    round(normalize_and_scale(weight, minweight, maxweight, 1.5, 5),2) normalizedweight
+  from (
+  select 
+    source, target, weight, totalsentinteractions, name, 
+    min(totalsentinteractions) over (order by constant) as mintotalinteractions,
+    max(totalsentinteractions) over (order by constant) as maxtotalinteractions,
+    min(weight) over (order by constant) as minweight,
+    max(weight) over (order by constant) as maxweight
+  from (
+  select 1 as constant, sender.systemrealname as source,
+     sender.systemrealname as name,
+    recipient.systemrealname as target,
+    numberofinteractions as weight,
+    sum(numberofinteractions) over (partition by sender.systemrealname) as totalsentinteractions
+  from (select senderid, recipientid, sum(1.00/totalnumofrecipients) as numberofinteractions
+  from message_info
+  group by senderid, recipientid) msgs 
+  join (
+  select personidentifierid, systemrealname
+  from person_identifier) sender
+    on sender.personidentifierid = msgs.senderid
+  join (
+  select personidentifierid, systemrealname 
+  from person_identifier) recipient
+    on recipient.personidentifierid = msgs.recipientid
+  where numberofinteractions >=3
+  order by sender.systemrealname) fields
+  ) aggregated
+  ) allrecs`
 };
 
 let execute = async (query,params) => {
