@@ -8,9 +8,10 @@ router.get("/getData", async (req, res) => {
 });
 
 router.get("/getGraphData", async (req, res) => {
-  let dbRes = await db.executeQuery(db.queries.getGraphData,[]);
-  console.log(dbRes.rows[0].graphlinks);
-  res.send(dbRes.rows[0].graphlinks)
+  //let dbRes = await db.executeQuery(db.queries.getGraphData,[]);
+  let dbRes = await db.executeQuery(db.queries.getCompanyGraphData, [])
+  // console.log(dbRes.rows[0]);
+  res.send(dbRes.rows[0])
 })
 
 module.exports = router;
