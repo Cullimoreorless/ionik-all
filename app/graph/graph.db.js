@@ -8,6 +8,16 @@ const dbClient = new Pool({
 });
 
 const queries = {
+  getSparkLines:`select datekey, id, name, sum(totalmessages) as totalmessages from (
+    select to_date(extract(year from messagetsutc)::text || '-'|| extract(week from messagetsutc)::text, 'yyyy-ww') as datekey, 
+      pid.personidentifierid as id, 
+      pid.systemrealname as name,
+      1.00/totalnumofrecipients as totalmessages
+    from message_info mi 
+    join person_identifier pid 
+      on pid.personidentifierid = mi.senderid) base
+    group by datekey, id, name
+    order by datekey, id`,
   getCompanyGraphData: `select 
     (select json_agg(jsonbase) from
     (select source,target, type, 

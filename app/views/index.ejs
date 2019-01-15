@@ -54,16 +54,26 @@ text {
 <footer>
 </footer>
 <script src="//d3js.org/d3.v3.js"></script>
+
 <script src="/js/jquery.min.js"></script>
 <script>
 $.ajax({url:"/molecule/getGraphData",
   success: (data) =>{
     let links = data.links;
     let preNodes = data.nodes;
+    let colorIndex = 0;
+    let colorCategory = {};
     let nodes = {};
+
+    let colorScale = d3.scale.ordinal(d3.schemeCategory10);
     preNodes.forEach(node => {
       nodes[node.id] = node;
+      if(colorCategory[node.location] == null){
+        colorCategory[node.location] = colorIndex++;
+        console.log(colorScale(colorIndex));
+      }
     });
+    console.log(colorCategory);
 
     // Compute the distinct nodes from the links.
     links.forEach(function(link) {
@@ -79,7 +89,7 @@ $.ajax({url:"/molecule/getGraphData",
         .nodes(d3.values(nodes))
         .links(links)
         .size([width, height])
-        .linkDistance(300)
+        .linkDistance(200)
         .charge(-300)
         .on("tick", tick)
         .start();
@@ -90,7 +100,7 @@ $.ajax({url:"/molecule/getGraphData",
 
     // Per-type markers, as they don't inherit styles.
     svg.append("defs").selectAll("marker")
-        .data(["OutOfWork", "RegularHours"])
+        .data(["OutsideOfWork", "RegularHours"])
       .enter().append("marker")
         .attr("id", function(d) { return d; })
         .attr("viewBox", "0 -5 10 10")
@@ -113,6 +123,8 @@ $.ajax({url:"/molecule/getGraphData",
         .data(force.nodes())
       .enter().append("circle")
         .attr("r", function(d) { return d.normalizedweight;})
+        .style("fill",function(d) { console.log(colorScale(colorCategory[d.location]));
+              return colorScale(colorCategory[d.location]);})
         .call(force.drag);
 
     var text = svg.append("g").selectAll("text")

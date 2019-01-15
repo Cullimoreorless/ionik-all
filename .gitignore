@@ -3,3 +3,5 @@
 **/.vscode
 slack/sample-json.json
 slack/package-lock.json
+**/.gitignore
+**/README.md
