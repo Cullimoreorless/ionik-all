@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 
-import { linkDistance,forceSimulation, forceCenter, forceLink, forceX, forceY} from 'd3-force'
+import { linkDistance,forceSimulation, forceCenter, forceLink, forceX, forceY,
+  minDistance, maxDistance} from 'd3-force'
 
 let d3 = require('d3')
 
@@ -147,25 +148,17 @@ class Graph extends Component{
             dr = Math.sqrt(dx * dx + dy * dy),
             plusdr = dr;
         if(d.type === "OutsideOfWork"){
-          plusdr = dr + 100;
+          plusdr = dr - 50;
         }
-        d.transform =  "M" + d.source.x + "," + d.source.y + "A" + dr + "," + plusdr + " 0 0,1 " + d.target.x + "," + d.target.y;
+        d.transform =  "M" + d.source.x + "," + d.source.y + "A" + plusdr + "," + plusdr + " 0 0,1 " + d.target.x + "," + d.target.y;
       
     })
     const width = this.width;
     const height = this.height
     return <div>
       <h1>New Component</h1>
-      {JSON.stringify(data)}
       <svg ref={node => this.node = node}
       width={width} height={height}>
-        <g>
-          {this.state.nodes.map((node, index) => (
-            <circle r={node.normalizedweight} 
-              transform={"translate("+ node.x + ", " + node.y+ ")"} 
-              key={"circle-" + index}/>
-          ))}
-        </g>
         <g>
           {links.map((link, index) => (
             
@@ -174,6 +167,20 @@ class Graph extends Component{
               d={link.transform}
               key={"link-"+index}
               />
+          ))}
+        </g>
+        <g>
+          {this.state.nodes.map((node, index) => (
+            
+            [<circle r={node.normalizedweight} 
+              transform={"translate("+ node.x + ", " + node.y+ ")"} 
+              key={"circle-" + index}></circle>,
+            <text 
+              x="0" y=".35em"
+              transform={"translate("+ (node.x + node.normalizedweight) + ", " + node.y+ ")"}
+              key={"text"+index}>
+              {node.name}
+              </text>]
           ))}
         </g>
       </svg>
