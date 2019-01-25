@@ -93,7 +93,7 @@ class Graph extends Component{
         var text = svg.append("g").selectAll("text")
             .data(sim.nodes())
           .enter().append("text")
-            .attr("x", 8)
+            .attr("x", function(d){return 3 + d.normalizedweight})
             .attr("y", ".35em")
             .text(function(d) { return d.name; });  
 
@@ -101,10 +101,10 @@ class Graph extends Component{
         // console.log(colorScale)
         // console.log(d3.values(nodes));
         let colors = {
-          "0":"#000",
-          "1":"#FFF",
-          "2":"#CCC",
-          "3":"#888"
+          "0":"#0F0",
+          "1":"#FDF",
+          "2":"#C3C",
+          "3":"#808"
         }
         function dragstarted(d) {
           if (!d3.event.active) sim.alphaTarget(0.3).restart();
@@ -134,9 +134,7 @@ class Graph extends Component{
                 .on("start", dragstarted)
                 .on("drag", dragged)
                 .on("end", dragended));
-            // .style("fill",function(d) { console.log(colorScale(colorCategory[d.location || "nonegiven"]));
-            //       return colorScale(colorCategory[d.location || "nonegiven"]);})
-            // .call(sim.drag);
+                
         console.log(circle);
         // Use elliptical arc path segments to doubly-encode directionality.
         let tick = ()=> {
@@ -187,7 +185,7 @@ class Graph extends Component{
     const width = this.width;
     const height = this.height
     return <div>
-      <h1>New Component</h1>
+      <h1>SVG Graph</h1>
       <svg ref={node => this.node = node}
       width={width} height={height}>
         {/* <g>

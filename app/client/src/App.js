@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 // import logo from './logo.svg';
 import './App.css';
 import Graph from './Graph'
+import CanvasGraph from './CanvasGraph'
 
 class App extends Component {
   render() {
@@ -10,6 +11,7 @@ class App extends Component {
         <header className="App-header">
           <div>
             <Graph/>
+            <CanvasGraph/>
           </div>
           <p>
             WTF Edit <code>src/App.js</code> and save to reload.
