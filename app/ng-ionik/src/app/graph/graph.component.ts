@@ -70,7 +70,7 @@ export class GraphComponent implements OnInit {
       console.log(this.nodes);
       
       let svg = d3.select(this.graphSVG.nativeElement)
-      svg.empty();
+      
 
       this.links.forEach(link => {
         link.source = this.nodes.find(n => n.id == link.source);
