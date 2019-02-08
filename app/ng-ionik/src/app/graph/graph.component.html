@@ -1,0 +1,9 @@
+<div #nodeLength>{{nodes.length}}</div>
+<svg #graphSVG [attr.width]="_options.width" [attr.height]="_options.height"></svg>
+<div *ngIf="graphData$ | async">
+  {{nodes}}
+</div>
+<div *ngFor="let node of nodes ">
+  {{node.name}}
+</div>
+ 
