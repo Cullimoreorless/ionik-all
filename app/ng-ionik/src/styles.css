@@ -15,10 +15,6 @@ body{
   stroke-width: 1.5px;
 }
 
-#licensing {
-  fill: green;
-}
-
 .link.Regular {
   stroke: green;
 }
@@ -37,4 +33,4 @@ text {
   font: 10px sans-serif;
   pointer-events: none;
   text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
-}
+} 

@@ -24,6 +24,10 @@ export class GraphComponent implements OnInit {
   graphData: {nodes:Node[],links:Link[]}
   graph: GraphSimulation;
 
+  startDate :string = (new Date()).toString();
+  endDate : string;
+  threshold : number = 10;
+
   private _options : {width, height} = {width:900,height:600};
   constructor(private graphService: GraphService, private ref:ChangeDetectorRef) { 
   }

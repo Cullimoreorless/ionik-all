@@ -1,9 +1,20 @@
-<div #nodeLength>{{nodes.length}}</div>
-<svg #graphSVG [attr.width]="_options.width" [attr.height]="_options.height"></svg>
-<div *ngIf="graphData$ | async">
-  {{nodes}}
+
+<div class="flex-container">
+  
+  
+  <div class="flex-three-quarters">
+
+      <svg #graphSVG [attr.width]="_options.width" [attr.height]="_options.height"></svg>
+  </div>
+  <div class="flex-one-quarter">
+    <label>Start Date</label><br/>
+    <input [(ngModel)]="startDate" ><br/>
+    <label>End Date</label><br/>
+    <input [(ngModel)]="endDate"><br/>
+    <label>Threshold</label><br/>
+    <input [(ngModel)]="threshold" type="number" step="1"><br/>
+    Threshold: {{threshold}}<br/>
+    Start Date: {{startDate}}<br/>
+    End Date: {{endDate}}
+  </div>
 </div>
-<div *ngFor="let node of nodes ">
-  {{node.name}}
-</div>
- 

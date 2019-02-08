@@ -1,29 +1,21 @@
-.link {
-  fill: none;
-  stroke: #666;
-  stroke-width: 1.5px;
+.flex-container{
+  display: flex;
 }
 
-#licensing {
-  fill: green;
+.flex-three-quarters{
+  flex: 3 1 75%;
+  background-color: silver;
+  min-height: 100px;
 }
 
-.link.Regular {
-  stroke: green;
+.flex-one-quarter{
+  flex: 1 1 25%;
+  background-color: green;
 }
 
-.link.OutsideOfWork {
-  stroke-dasharray: 0,2 1;
+input {
+  width:250px;
 }
-
-circle {
-  fill: #ccc;
-  stroke: #333;
-  stroke-width: 1.5px;
-}
-
-text {
-  font: 10px sans-serif;
-  pointer-events: none;
-  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+label {
+  width:100%;
 }
