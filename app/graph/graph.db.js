@@ -33,6 +33,27 @@ const queries = {
     join person_identifier pid 
       on pid.personidentifierid = mi.senderid
         and pid.companyidentifierid = 1
+        and mi.sendertslocal >= :startDate
+        and mi.sendertslocal <= :endDate
+    group by senderid, recipientid, sentoutofworkhours
+    having (sum(1.00/totalnumofrecipients)) >= :threshold) base) aggbase) jsonbase) as links,
+    (select json_agg(jsonbase) from 
+    (select * from vw_graph_nodes)jsonbase) as nodes`,
+  getCompanyGraphData12: `select 
+    (select json_agg(jsonbase) from
+    (select source,target, type, 
+      round(normalize_and_scale(numberofinteractions, mininter, maxinter, 1.5, 6),2) as normalizedweight
+    from 
+    (select max(numberofinteractions) over (order by constant) as maxinter,
+      min(numberofinteractions) over (order by constant) as mininter, *
+    from 
+    (select 1 as constant, senderid as source, recipientid as target, 
+      case when sentoutofworkhours then 'OutsideOfWork' else 'RegularHours' end as type, 
+      sum(1.00/totalnumofrecipients) as numberofinteractions
+    from message_info mi 
+    join person_identifier pid 
+      on pid.personidentifierid = mi.senderid
+        and pid.companyidentifierid = 1
     group by senderid, recipientid, sentoutofworkhours
     having (sum(1.00/totalnumofrecipients)) >= 1) base) aggbase) jsonbase) as links,
     (select json_agg(jsonbase) from 
@@ -83,9 +104,9 @@ const queries = {
 };
 
 let execute = async (query,params) => {
-  if(!(params instanceof Array)){
-    params = [params];
-  }
+  // if(!(params instanceof Array)){
+  //   params = [params];
+  // }
   console.log("Ionik - executing " + query)
   const res = await dbClient.query(query, params) 
   console.log("Complete!")

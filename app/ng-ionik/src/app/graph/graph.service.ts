@@ -16,7 +16,9 @@ export class GraphService {
     return graph;
   }
 
-  getGraphData(params: Object | null)  {
-    return this.http.get('/api/molecule/getGraphData');
+  getGraphData(params)  {
+    return this.http.get('/api/molecule/getGraphData',{
+      params:params
+    });
   }
 }

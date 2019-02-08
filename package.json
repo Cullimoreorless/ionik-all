@@ -17,6 +17,7 @@
   "dependencies": {
     "@slack/client": "^4.8.0",
     "cors": "^2.8.5",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "pg-parameters": "^0.2.3"
   }
 }

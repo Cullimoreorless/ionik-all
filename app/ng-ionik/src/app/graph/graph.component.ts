@@ -24,12 +24,17 @@ export class GraphComponent implements OnInit {
   graphData: {nodes:Node[],links:Link[]}
   graph: GraphSimulation;
 
-  startDate :string = (new Date()).toString();
+  startDate :string;
   endDate : string;
-  threshold : number = 10;
+  threshold : number;
 
   private _options : {width, height} = {width:900,height:600};
   constructor(private graphService: GraphService, private ref:ChangeDetectorRef) { 
+    let now = new Date();
+    let prev = new Date();
+    this.startDate = '7/1/2018';
+    this.endDate = now.toLocaleDateString();
+    this.threshold = 10;
   }
 
   ngOnInit(){
@@ -47,8 +52,17 @@ export class GraphComponent implements OnInit {
   ngAfterViewInit(){
   }
 
+  refreshGraph(){
+    this.graphSVG.nativeElement.empty()
+    this.getGraph();
+  }
+
   getGraph(){
-    this.graphData$ = this.graphService.getGraphData({});
+    this.graphData$ = this.graphService.getGraphData({
+      startDate:this.startDate,
+      endDate:this.endDate,
+      threshold:this.threshold
+    });
     this.graphData$.subscribe((data : {nodes:Node[],links:Link[]} ) =>{
       this.graphData = data;
       this.nodes = this.graphData.nodes;
@@ -56,6 +70,7 @@ export class GraphComponent implements OnInit {
       console.log(this.nodes);
       
       let svg = d3.select(this.graphSVG.nativeElement)
+      svg.empty();
 
       this.links.forEach(link => {
         link.source = this.nodes.find(n => n.id == link.source);
