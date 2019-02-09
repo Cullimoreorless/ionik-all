@@ -34,3 +34,31 @@ text {
   pointer-events: none;
   text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
 } 
+
+.tc{
+  background-color: #FE4A49;
+  color:#f2f5f9;
+}
+.cd{
+  background-color: #009FB7;
+  color:#f2f5f9;
+}
+.cl{
+  background-color: #E5E5E5;
+  color:slategray;
+}
+.wd{
+  background-color: #E37222;
+  color:#f2f5f9;
+}
+.wl{
+  background-color: #EEAA7B;
+  color:slategray;
+}
+
+.dark-text{
+  color:slategrey;
+}
+.light-text{
+  color:#f2f5f9;
+}

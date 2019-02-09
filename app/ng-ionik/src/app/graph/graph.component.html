@@ -2,20 +2,26 @@
 <div class="flex-container">
   
   
-  <div class="flex-three-quarters">
+  <div class="flex-three-quarters cl">
 
       <svg #graphSVG [attr.width]="_options.width" [attr.height]="_options.height"></svg>
   </div>
-  <div class="flex-one-quarter">
-    <label>Start Date</label><br/>
-    <input [(ngModel)]="startDate" ><br/>
-    <label>End Date</label><br/>
-    <input [(ngModel)]="endDate"><br/>
-    <label>Threshold</label><br/>
-    <input [(ngModel)]="threshold" type="number" step="1"><br/>
-    Threshold: {{threshold}}<br/>
-    Start Date: {{startDate}}<br/>
-    End Date: {{endDate}}<br/>
-    <button (click)="refreshGraph()">Submit</button>
+  <div class="flex-one-quarter wd">
+    <div class="form-container">
+      <label>
+        Start Date
+        <input [(ngModel)]="startDate" >
+      </label>
+      <label>
+        End Date
+        <input [(ngModel)]="endDate">
+      </label>
+      <label>
+        Threshold
+        <input [(ngModel)]="threshold" type="number" step="1">
+      </label>
+      
+      <button class="affirmative cd" type="submit" (click)="refreshGraph()">Submit</button>
+    </div>
   </div>
 </div>

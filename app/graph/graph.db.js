@@ -1,5 +1,5 @@
-const {Pool} = require('pg')
-const dbClient = new Pool({
+const {Client} = require('pg-parameters')
+const dbClient = new Client({
   user:process.env.IONIKDBUSER,
   password:process.env.IONIKDBPASSWORD,
   host:process.env.IONIKDBHOST,
@@ -19,7 +19,7 @@ const queries = {
     group by datekey, id, name
     order by datekey, id`,
   getCompanyGraphData: `select 
-    (select json_agg(jsonbase) from
+    (select coalesce(json_agg(jsonbase),'[]'::json) from
     (select source,target, type, 
       round(normalize_and_scale(numberofinteractions, mininter, maxinter, 1.5, 6),2) as normalizedweight
     from 

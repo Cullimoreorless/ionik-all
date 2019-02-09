@@ -10,7 +10,9 @@ import { FormsModule } from '@angular/forms';
 @NgModule({
   declarations: [
     AppComponent,
-    GraphComponent
+    GraphComponent,
+    LinkVisualComponent,
+    NodeVisualComponent
   ],
   imports: [
     BrowserModule,

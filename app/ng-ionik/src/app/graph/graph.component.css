@@ -4,18 +4,36 @@
 
 .flex-three-quarters{
   flex: 3 1 75%;
-  background-color: silver;
   min-height: 100px;
 }
 
 .flex-one-quarter{
   flex: 1 1 25%;
-  background-color: green;
+}
+
+.form-container{
+  padding:20px;
+  display:block;
 }
 
 input {
+  height:1.8em;
+  max-width: 400px;
   width:250px;
+  font-size:1em;
+  padding:.4em;
+  border-radius: 5px;
 }
 label {
+  display: block;
   width:100%;
+  line-height: 1.5em;
+  margin: 10px 0px 7px;
+}
+
+button{
+  padding:12px 32px;
+  margin:12px 0px;
+  border-radius: 8px;
+  font-size: 1em;
 }
