@@ -6,6 +6,7 @@ import { Node } from './node';
 import { Link } from './link';
 import { GraphSimulation } from './graph-simulation';
 import { GraphService } from './graph.service';
+import { GlobalsService} from '../globals.service';
 import { Observable } from 'rxjs';
 import * as d3 from 'd3';
 //ng serve -o --proxy-config proxy.conf.json
@@ -24,12 +25,15 @@ export class GraphComponent implements OnInit {
   graphData: {nodes:Node[],links:Link[]}
   graph: GraphSimulation;
 
+  colorArray:string[];
+
   startDate :string;
   endDate : string;
   threshold : number;
 
   private _options : {width, height} = {width:900,height:600};
-  constructor(private graphService: GraphService, private ref:ChangeDetectorRef) { 
+  constructor(private graphService: GraphService, 
+              private GLOBALS: GlobalsService, private ref:ChangeDetectorRef) { 
     let now = new Date();
     let prev = new Date();
     this.startDate = '7/1/2018';
@@ -68,7 +72,14 @@ export class GraphComponent implements OnInit {
       this.nodes = this.graphData.nodes;
       this.links = this.graphData.links;
       console.log(this.nodes);
-      
+      this.colorArray = this.nodes.reduce((acc, curr) =>{
+        if(!(curr.location in acc)){
+          acc.push(curr.location)
+        }
+        return acc;
+      },[]);
+      let colorScale = this.getColorTransform();
+      let colorArrayLocal = this.colorArray;
       let svg = d3.select(this.graphSVG.nativeElement)
       svg.selectAll("*").remove();
 
@@ -120,7 +131,7 @@ export class GraphComponent implements OnInit {
           .enter()
             .append("circle")
             .attr("r", function(d) { return d.normalizedweight;})
-            .style("fill","green")
+            .style("fill",function(d){return colorScale(colorArrayLocal.findIndex(el => el == d.location))})
             .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
@@ -153,6 +164,17 @@ export class GraphComponent implements OnInit {
 
   transform(d){
     return "translate(" + d.x + "," + d.y + ")";
+  }
+
+  getColorTransform(){
+    let domainLength = this.colorArray.length;
+    let colorRange = [d3.rgb(this.GLOBALS.coolDark),
+                d3.rgb(this.GLOBALS.warmDark)]
+    return d3.scaleLinear()
+      .domain([0,domainLength-1])
+      .range(colorRange)
+      .interpolate(d3.interpolateHcl)//pull these values from highs and lows on styles.css
+
   }
 
   get options() {

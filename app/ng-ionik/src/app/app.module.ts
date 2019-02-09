@@ -6,13 +6,12 @@ import { AppComponent } from './app.component';
 import { GraphComponent } from './graph/graph.component';
 import { HttpClientModule} from '@angular/common/http'
 import { FormsModule } from '@angular/forms';
+import { GlobalsService } from './globals.service';
 
 @NgModule({
   declarations: [
     AppComponent,
-    GraphComponent,
-    LinkVisualComponent,
-    NodeVisualComponent
+    GraphComponent
   ],
   imports: [
     BrowserModule,
@@ -20,7 +19,9 @@ import { FormsModule } from '@angular/forms';
     HttpClientModule,
     FormsModule
   ],
-  providers: [],
+  providers: [
+    GlobalsService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

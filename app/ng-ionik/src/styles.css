@@ -35,6 +35,13 @@ text {
   text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
 } 
 
+/* This is the main coloring block for consistent theme:
+  tc- total contrast (good for CTA)
+  cd - cool dark - the darker of the cool colors on the scale
+  cl - cool light - the lighter of the cool colors on the scale
+  wl - warm light - the lighter of the warm colors
+  wd - warm dark - the darker of the warm colors
+  Also for use in the Globals service */
 .tc{
   background-color: #FE4A49;
   color:#f2f5f9;
