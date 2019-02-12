@@ -7,7 +7,8 @@ import { Link } from './link';
 import { GraphSimulation } from './graph-simulation';
 import { GraphService } from './graph.service';
 import { GlobalsService} from '../globals.service';
-import { Observable } from 'rxjs';
+import { debounceTime } from 'rxjs/operators'
+import { fromEvent, Subscription, Observable } from 'rxjs';
 import * as d3 from 'd3';
 //ng serve -o --proxy-config proxy.conf.json
 
@@ -32,6 +33,9 @@ export class GraphComponent implements OnInit {
   endDate : string;
   threshold : number;
 
+  resizeObservable$:Observable<Event>;
+  resizeSubscription$:Subscription
+
   private _options : {width, height} = {width:900,height:600};
   constructor(private graphService: GraphService, 
               private GLOBALS: GlobalsService, private ref:ChangeDetectorRef) { 
@@ -43,7 +47,14 @@ export class GraphComponent implements OnInit {
   }
 
   ngOnInit(){
+    this.resizeObservable$ = fromEvent(window,'resize')
+    this.resizeSubscription$ = this.resizeObservable$.pipe(debounceTime(1000)).subscribe(evt =>{
+      console.log(window.outerWidth)
+    });
+  }
 
+  ngOnDestroy(){
+    this.resizeSubscription$.unsubscribe();
   }
 
   ngAfterContentInit() {

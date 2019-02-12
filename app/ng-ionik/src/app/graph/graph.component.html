@@ -2,26 +2,12 @@
 <div class="flex-container">
   
   
-  <div #gContainer class="flex-three-quarters cl" (window.resize)="windowResize($event)">
+  <div #gContainer class="cl" (window.resize)="windowResize($event)">
 
       <svg #graphSVG [attr.width]="_options.width" [attr.height]="_options.height"></svg>
   </div>
-  <div class="flex-one-quarter wd">
-    <div class="form-container">
-      <label>
-        Start Date
-        <input [(ngModel)]="startDate" >
-      </label>
-      <label>
-        End Date
-        <input [(ngModel)]="endDate">
-      </label>
-      <label>
-        Threshold
-        <input [(ngModel)]="threshold" type="number" step="1">
-      </label>
-      
-      <button class="affirmative cd" type="submit" (click)="refreshGraph()">Refresh</button>
-    </div>
+  <div class="filter-container">
+    <sliding-menu></sliding-menu>
+    
   </div>
 </div>
