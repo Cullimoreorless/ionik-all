@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output,
+ EventEmitter } from '@angular/core';
 import { trigger, transition,
           animate, style } from '@angular/animations';
 import { GraphFilters } from 'src/app/graph-filters';
@@ -22,15 +23,11 @@ import { GraphFilters } from 'src/app/graph-filters';
   ]
 })
 export class SlidingMenuComponent implements OnInit {
+  @Output() params : EventEmitter<GraphFilters> = new EventEmitter();
+  
   showMenu=false;
   graphParams : GraphFilters = new GraphFilters();
   constructor() { 
-    let now = new Date();
-    let prev = new Date();
-    
-    this.graphParams.startDate = '7/1/2018';
-    this.graphParams.endDate = now.toLocaleDateString();
-    this.graphParams.threshold = 10;
   }
 
   ngOnInit() {
@@ -38,6 +35,10 @@ export class SlidingMenuComponent implements OnInit {
 
   toggleMenu(){
     this.showMenu = !this.showMenu;
+  }
+
+  sendValues(){
+    this.params.emit(this.graphParams);
   }
 
 }

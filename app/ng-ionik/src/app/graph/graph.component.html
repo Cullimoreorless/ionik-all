@@ -7,7 +7,7 @@
       <svg #graphSVG [attr.width]="_options.width" [attr.height]="_options.height"></svg>
   </div>
   <div class="filter-container">
-    <sliding-menu></sliding-menu>
+    <sliding-menu (params)="getParams($event)"></sliding-menu>
     
   </div>
 </div>

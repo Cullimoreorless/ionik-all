@@ -10,6 +10,7 @@ import { GlobalsService} from '../globals.service';
 import { debounceTime } from 'rxjs/operators'
 import { fromEvent, Subscription, Observable } from 'rxjs';
 import * as d3 from 'd3';
+import { GraphFilters } from '../graph-filters';
 //ng serve -o --proxy-config proxy.conf.json
 
 @Component({
@@ -29,9 +30,7 @@ export class GraphComponent implements OnInit {
 
   colorArray:string[];
 
-  startDate :string;
-  endDate : string;
-  threshold : number;
+  graphFilters : GraphFilters = new GraphFilters();
 
   resizeObservable$:Observable<Event>;
   resizeSubscription$:Subscription
@@ -40,10 +39,6 @@ export class GraphComponent implements OnInit {
   constructor(private graphService: GraphService, 
               private GLOBALS: GlobalsService, private ref:ChangeDetectorRef) { 
     let now = new Date();
-    let prev = new Date();
-    this.startDate = '7/1/2018';
-    this.endDate = now.toLocaleDateString();
-    this.threshold = 10;
   }
 
   ngOnInit(){
@@ -68,17 +63,19 @@ export class GraphComponent implements OnInit {
   ngAfterViewInit(){
   }
 
+
+  getParams(event){
+    this.graphFilters = event;
+    this.refreshGraph();
+  }
+
   refreshGraph(){
     // this.graphSVG.nativeElement.empty()
     this.getGraph();
   }
 
   getGraph(){
-    this.graphData$ = this.graphService.getGraphData({
-      startDate:this.startDate,
-      endDate:this.endDate,
-      threshold:this.threshold
-    });
+    this.graphData$ = this.graphService.getGraphData(this.graphFilters);
     this.graphData$.subscribe((data : {nodes:Node[],links:Link[]} ) =>{
       this.graphData = data;
       this.nodes = this.graphData.nodes;
@@ -197,6 +194,7 @@ export class GraphComponent implements OnInit {
       .interpolate(d3.interpolateHcl)//pull these values from highs and lows on styles.css
 
   }
+
 
   get options() {
     return this._options = {
