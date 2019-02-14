@@ -71,7 +71,6 @@ text {
 input {
   height:1.8em;
   max-width: 400px;
-  width:250px;
   font-size:1em;
   padding:.4em;
   border-radius: 5px;
@@ -83,17 +82,17 @@ label {
   margin: 10px 0px 7px;
 }
 
+button{
+  border-radius: 8px;
+  font-size: 1em;
+}
 button.btn-reg{
   padding:12px 12px;
   margin:12px 0px 12px 12px;
-  border-radius: 8px;
-  font-size: 1em;
 }
 
 button.btn-sm{
   padding:8px 10px;
-  border-radius: 8px;
-  font-size: 1em;
 }
 button.btn-transparent{
   opacity: 0.5;

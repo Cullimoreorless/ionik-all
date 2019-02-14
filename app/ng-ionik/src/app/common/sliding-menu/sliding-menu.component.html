@@ -7,24 +7,22 @@
           <i class="fas fa-bars"></i>
       </button>
     </div>
-    <div >
-      <div *ngIf="showMenu" [@slideInOut] class="menu wd">
-        <div class="form-container">
-          <label>
-            Start Date
-            <input [(ngModel)]="graphParams.startDate" >
-          </label>
-          <label>
-            End Date
-            <input [(ngModel)]="graphParams.endDate">
-          </label>
-          <label>
-            Threshold
-            <input [(ngModel)]="graphParams.threshold" type="number" step="1">
-          </label>
-          
-          <button class="affirmative cd btn-reg" type="submit" (click)="sendValues()">Refresh</button>
-        </div>
+    <div *ngIf="showMenu" [@slideInOut] class="menu wd">
+      <div class="form-container">
+        <label>
+          Start Date
+          <input [(ngModel)]="graphParams.startDate" >
+        </label>
+        <label>
+          End Date
+          <input [(ngModel)]="graphParams.endDate">
+        </label>
+        <label>
+          Threshold
+          <input [(ngModel)]="graphParams.threshold" type="number" step="1">
+        </label>
+        
+        <button class=" cd submit-btn" type="submit" (click)="sendValues()">Refresh</button>
       </div>
     </div>
   </div>
