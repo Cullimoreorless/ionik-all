@@ -41,23 +41,28 @@ text {
   wd - warm dark - the darker of the warm colors
   Also for use in the Globals service */
 .tc{
-  background-color: #FE4A49;
+  background-color:  #FE4A49; 
+  /* background-color: #99C24D; */
   color:#f2f5f9;
 }
 .cd{
-  background-color: #009FB7;
+  /* background-color: #009FB7; */
+  background-color: #006E90;
   color:#f2f5f9;
 }
 .cl{
-  background-color: #E5E5E5;
+  /* background-color: #E5E5E5; */
+  background-color: #41BBD9;
   color:slategray;
 }
 .wd{
-  background-color: #E37222;
+  /* background-color: #E37222; */
+  background-color: #F18F01;
   color:#f2f5f9;
 }
 .wl{
-  background-color: #EEAA7B;
+  /* background-color: #EEAA7B; */
+  background-color: #ADCAD6;
   color:slategray;
 }
 
@@ -71,6 +76,7 @@ text {
 input {
   height:1.8em;
   max-width: 400px;
+  min-width: 200px;
   font-size:1em;
   padding:.4em;
   border-radius: 5px;
@@ -88,7 +94,8 @@ button{
 }
 button.btn-reg{
   padding:12px 12px;
-  margin:12px 0px 12px 12px;
+  margin-top: 15px;
+  margin-bottom: 8px;
 }
 
 button.btn-sm{

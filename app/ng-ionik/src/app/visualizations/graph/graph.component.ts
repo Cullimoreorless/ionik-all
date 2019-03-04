@@ -6,11 +6,11 @@ import { Node } from './node';
 import { Link } from './link';
 import { GraphSimulation } from './graph-simulation';
 import { GraphService } from './graph.service';
-import { GlobalsService} from '../globals.service';
+import { GlobalsService} from '@/services/globals.service';
 import { debounceTime } from 'rxjs/operators'
 import { fromEvent, Subscription, Observable } from 'rxjs';
 import * as d3 from 'd3';
-import { GraphFilters } from '../graph-filters';
+import { GraphFilters } from '@/graph-filters'; 
 //ng serve -o --proxy-config proxy.conf.json
 
 @Component({
@@ -186,7 +186,7 @@ export class GraphComponent implements OnInit {
 
   getColorTransform(){
     let domainLength = this.colorArray.length;
-    let colorRange = [d3.rgb(this.GLOBALS.coolDark),
+    let colorRange :any= [d3.rgb(this.GLOBALS.coolDark),
                 d3.rgb(this.GLOBALS.warmDark)]
     return d3.scaleLinear()
       .domain([0,domainLength-1])

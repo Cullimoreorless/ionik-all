@@ -1,0 +1,31 @@
+<div class="register-user-container">
+  <form [formGroup]="form" class="register-form-container wd">
+    <fieldset>
+      <legend>
+        Create user
+      </legend>
+      <div >
+        <label>
+          Username
+        </label>
+        <input type="text" formControlName="username"/>
+      </div>
+      <div class="field-container">
+        <label>
+          Password
+        </label>
+        <input type="password" formControlName="password"/>
+        
+      </div>
+      <div class="field-container">
+        <label>
+          Confirm Password
+        </label>
+        <input type="password" formControlName="confirmPassword"/>
+      </div>
+      <div>
+        <button class="cd btn-reg" type="submit" (click)="register()">Register</button>
+      </div>
+    </fieldset>
+  </form>
+</div>

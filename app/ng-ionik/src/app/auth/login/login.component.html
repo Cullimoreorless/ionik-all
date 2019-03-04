@@ -1,0 +1,22 @@
+<div class="login-container">
+  <div [formGroup]="form" class="login-form wd">
+    <fieldset>
+      <legend>Login</legend>
+      <div>
+        <label>
+          Username
+        </label>
+        <input class="login-text" type="text" formControlName="username" />
+      </div>
+      <div>
+        <label>
+          Password
+        </label>
+        <input class="login-text" type="password" formControlName="password" />
+      </div>
+      <div>
+        <button type="submit" class="btn-reg cd">Login</button>
+      </div>
+    </fieldset>
+  </div>
+</div>

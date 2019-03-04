@@ -16,8 +16,10 @@
   "license": "ISC",
   "dependencies": {
     "@slack/client": "^4.8.0",
+    "connect-pg-simple": "^5.0.0",
     "cors": "^2.8.5",
     "express": "^4.16.4",
+    "express-session": "^1.15.6",
     "fs": "0.0.1-security",
     "jsonwebtoken": "^8.4.0",
     "pg-parameters": "^0.2.3"

@@ -145,6 +145,16 @@ create table message_info
   foreign key (conversationid) references conversation(conversationid)
 );
 
+
+drop table if exists app_user;
+create table app_user (
+	appuserid serial,
+	username varchar(255),
+	pwhash text,
+	createts timestamp,
+	endts timestamp
+);
+
 create or replace function public.is_outside_work_hours(ts timestamp) returns boolean as $$
 declare tsdecimaltime numeric = extract(hour from ts) + (extract(min from ts) / 60.000);
 declare tsdow numeric = extract(dow from ts);
