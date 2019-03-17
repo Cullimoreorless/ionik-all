@@ -12,10 +12,13 @@ import { SlidingMenuComponent } from './common/sliding-menu/sliding-menu.compone
 import { LoginComponent } from './auth/login/login.component';
 import { Routes, RouterModule } from '@angular/router';
 import { RegisterUserComponent } from './auth/register-user/register-user.component';
+import { CompanyIdentifiersComponent } from './crud/company/company-identifiers.component';
+import { CompanyComponent } from './crud/company/company.component';
 
 const routes : Routes = [
   { path: "login", component: LoginComponent },
   { path: "register", component: RegisterUserComponent },
+  { path: "company", component: CompanyComponent},
   { path: "network", component: GraphComponent },
   { path: '',
     redirectTo: '/network',
@@ -29,7 +32,9 @@ const routes : Routes = [
     GraphComponent,
     SlidingMenuComponent,
     LoginComponent,
-    RegisterUserComponent
+    RegisterUserComponent,
+    CompanyIdentifiersComponent,
+    CompanyComponent
   ],
   imports: [
     BrowserModule,

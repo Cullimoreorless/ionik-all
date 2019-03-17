@@ -11,6 +11,7 @@ import { debounceTime } from 'rxjs/operators'
 import { fromEvent, Subscription, Observable } from 'rxjs';
 import * as d3 from 'd3';
 import { GraphFilters } from '@/graph-filters'; 
+import { ColorCommonInstance } from 'd3';
 //ng serve -o --proxy-config proxy.conf.json
 
 @Component({
@@ -186,8 +187,9 @@ export class GraphComponent implements OnInit {
 
   getColorTransform(){
     let domainLength = this.colorArray.length;
-    let colorRange :any= [d3.rgb(this.GLOBALS.coolDark),
-                d3.rgb(this.GLOBALS.warmDark)]
+    let colorRange :any= [d3.rgb(this.GLOBALS.coolDark) ,
+                d3.rgb(this.GLOBALS.warmDark) ]
+    console.log(colorRange)
     return d3.scaleLinear()
       .domain([0,domainLength-1])
       .range(colorRange)

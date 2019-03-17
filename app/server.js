@@ -3,10 +3,20 @@ const helmet = require('helmet')
 const graphController = require('./graph/graph.controller')
 // const userController = require('./user/user.controller')
 
+//crud controllers
+const companyController = require('./controllers/company.controller')
+
 const path = require('path')
 
-
 require('dotenv').load();
+const dbConn = {
+  user:process.env.IONIKDBUSER,
+  password:process.env.IONIKDBPASSWORD,
+  host:process.env.IONIKDBHOST,
+  database:process.env.IONIKDBDATABASE,
+  port:process.env.IONIKDBPORT
+}; 
+
 
 const app = express();
 
@@ -18,13 +28,7 @@ const pgConn = require('pg');
 const session = require('express-session');
 const pgSess = require('connect-pg-simple')(session);
 
-let pgSessPool = pgConn.Pool({
-  user:process.env.IONIKDBUSER,
-  password:process.env.IONIKDBPASSWORD,
-  host:process.env.IONIKDBHOST,
-  database:process.env.IONIKDBDATABASE,
-  port:process.env.IONIKDBPORT
-});
+let pgSessPool = pgConn.Pool(dbConn);
 
 app.use(session({
   store:new pgSess({
@@ -39,15 +43,16 @@ app.use(session({
 
 
 app.use(helmet())
+app.use(express.json())
 const port = process.env.PORT ||3000;
 
 app.use(express.static(path.join(__dirname, "public")))
 
-app.use("/molecule", graphController)
+app.use("/molecule", graphController); 
 // app.user("/user",userController)
-
+app.use('/company', companyController);
 
 app.listen(port, () => {
-  console.log(`Ionik Web App listening on port ${port}`)
+  console.log(`Siamo Web App listening on port ${port}`)
 });
 

@@ -154,3 +154,24 @@ create table edw.fact_message_info(
 	foreign key (projectteamkey) references edw.dim_project_team(projectteamkey),
 	foreign key (datekey) references edw.dim_date(datekey)
 );
+
+insert into edw.dim_identifier_type (identifiertype)
+select systemtypedesc
+from system_type 
+where systemtypedesc not in (select identifiertype
+from edw.dim_identifier_type);
+
+insert into edw.dim_company (companycode, companyname, createts) 
+select distinct companycode, companyname, now()
+from company_name cn
+where not exists (select 1 from edw.dim_company dc
+where dc.companycode = cn.companycode);
+
+
+update edw.dim_company
+set companyname = base.companyname,
+  updatets = now()
+from (select distinct companycode, companyname 
+from company_name) base
+where base.companycode = dim_company.companycode
+	and base.companyname <> dim_company.companyname;

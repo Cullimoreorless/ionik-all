@@ -23,5 +23,8 @@
     "fs": "0.0.1-security",
     "jsonwebtoken": "^8.4.0",
     "pg-parameters": "^0.2.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.10"
   }
 }

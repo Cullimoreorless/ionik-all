@@ -1,0 +1,21 @@
+<div class="company-container">
+  <form [formGroup]="form" (ngSubmit)="saveCompany()" class="company-form wd">
+    <fieldset>
+      <legend>Company</legend>
+      <input type="hidden" formControlName="companyid"/>
+      <div>
+        <label for="companyCode">Company Code</label>
+        <input type="text" class="company-text" formControlName="companycode" />
+      </div>
+      <div>
+        <label for="companyName">Company Name</label>
+        <input type="text" class="company-text" formControlName="companyname" />
+      </div>
+      <div>
+        <button class="btn-reg cd" type="submit">
+          Submit
+        </button>
+      </div>
+    </fieldset>
+  </form> 
+</div>
