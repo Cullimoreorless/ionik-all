@@ -34,13 +34,17 @@ CRUDContext.prototype.separateColumns = (columnVals) =>{
   return result;
 }
 
-//TODO: add "other columns" to helpers
 CRUDContext.prototype.upsert = async (upsertInfo) =>{
   let cols = this.separateColumns(upsertInfo);
+  let result = null;
   let existingRow = await DBHelper.findFirstById(this.ctx.tableName, cols.idValues);
   if(!existingRow){
-    DBHelper.insertToTable(this.ctx.)
+    result = await DBHelper.insertToTable(this.ctx.tableName, cols.updateValues)
   } 
+  else{
+    result = await DBHelper.updateById(this.ctx.tableName, cols.idValues, cols.updateValues);
+  }
+  return result;
 }
 
 

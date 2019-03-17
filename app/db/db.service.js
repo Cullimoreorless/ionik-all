@@ -22,7 +22,7 @@ const DBHelper = {
     return knex(tableName).where(idValue).limit(1).select('*');
   },
   updateById: async (tableName, idValue, updateValues) => {
-    return knex(tableName).where(idValue).update(updateValues);
+    return knex(tableName).where(idValue).update(updateValues).returning("*");
   }
 
   
