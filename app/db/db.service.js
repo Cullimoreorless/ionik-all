@@ -11,18 +11,15 @@ const knex = require('knex')({
 });
 
 const DBHelper = {
-  insertToTable: async (tableName, columns) => {
-    // let finalColumns = {};
-    // for(key in columns){
-    //   finalColumns[key.toLowerCase()] = columns[key];
-    // }
-    return knex(tableName).insert(finalColumns).returning('*');
+  currentts: knex.fn.now(),
+  insertToTable: async (tableName, insCols, columns) => {
+    return knex(tableName).insert(insCols).returning(columns);
   },
   findFirstById: async (tableName, idValue) => {
     return knex(tableName).where(idValue).limit(1).select('*');
   },
-  updateById: async (tableName, idValue, updateValues) => {
-    return knex(tableName).where(idValue).update(updateValues).returning("*");
+  updateById: async (tableName, idValue, updateValues, columns) => {
+    return knex(tableName).where(idValue).update(updateValues).returning(columns);
   }
 
   

@@ -60,6 +60,31 @@ create table system_type
 insert into system_type (systemtypedesc) values ('Slack');
 insert into system_type (systemtypedesc) values ('Outlook Mail');
 
+drop table if exists company_name;
+create table company_name(
+  companyid serial,
+  companycode varchar(10),
+  companyname text,
+  createts timestamp, 
+  updatets timestamp,
+  endts timestamp
+);
+
+--select * from company_integration
+drop table if exists company_integration;
+create table company_integration(
+  companyintegrationid serial,
+  companyid int,
+  systemtypeid int,
+  integrationidentifier text,
+  systemid text,
+  lastretrievedutc timestamp,
+  createts timestamp, 
+  updatets timestamp,
+  endts timestamp
+	
+);
+
 drop table if exists company_identifier;
 create table company_identifier (
   companyidentifierid serial primary key, 

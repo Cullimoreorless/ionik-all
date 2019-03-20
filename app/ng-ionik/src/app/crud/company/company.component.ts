@@ -19,6 +19,7 @@ export class CompanyComponent implements OnInit {
   constructor(private fb: FormBuilder, private http: HttpClient) { }
 
   ngOnInit() { 
+    this.form.setValue({companyid:0, companycode:'',companyname:''})
   }
 
   saveCompany(){
