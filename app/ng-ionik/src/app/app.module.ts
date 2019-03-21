@@ -19,6 +19,7 @@ const routes : Routes = [
   { path: "login", component: LoginComponent },
   { path: "register", component: RegisterUserComponent },
   { path: "company", component: CompanyComponent},
+  { path: "companyID/:companyId", component: CompanyComponent},
   { path: "network", component: GraphComponent },
   { path: '',
     redirectTo: '/network',

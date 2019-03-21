@@ -3,9 +3,11 @@ const router = express.Router();
 const CRUDContext = require('./../db/crud.service');
 const companyContext = new CRUDContext('company');
 
-router.get('/what/:companyId', async (req,res) => {
+router.get('/getCompany/:companyId', async (req,res) => {
   ///get company
-  console.log(req.params.companyId)
+  res.send({
+    companyid:1, companycode:"code", companyname:"name"
+  })
 });
 
 router.post('/saveCompany', async (req, res) =>{

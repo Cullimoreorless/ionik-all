@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'company',
@@ -16,10 +19,20 @@ export class CompanyComponent implements OnInit {
     companyname:['']
   });
 
-  constructor(private fb: FormBuilder, private http: HttpClient) { }
+  constructor(
+    private fb: FormBuilder, 
+    private http: HttpClient,
+    private route: ActivatedRoute) { }
 
   ngOnInit() { 
-    this.form.setValue({companyid:0, companycode:'',companyname:''})
+    let x = this.route.paramMap.pipe(
+      switchMap((params:ParamMap) => 
+        this.http.get(`/api/company/getCompany/${params.get('companyId')}`)
+      )
+    )
+    x.subscribe(next =>
+      this.form.setValue(next));
+    // this.form.setValue({companyid:0, companycode:'',companyname:''})
   }
 
   saveCompany(){
