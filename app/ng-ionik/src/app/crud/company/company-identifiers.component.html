@@ -1,3 +1,45 @@
-<p>
-  company-identifiers works!
-</p>
+
+<form [formGroup]="form" (ngSubmit)="saveCompanyIntegrations()" class="company-integration-form wd">
+  <fieldset>
+    <legend>Company Integrations</legend>
+    <button (click)="addIntegration()" type="button" class="btn-reg">Add Integration</button>
+    <div>
+      <div class="flex-container">
+          <div class="flex-40">
+            <label for="systemType">Type</label>
+          </div>
+          <div class="flex-40">
+            <label for="integrationIdentifier">Identifier (usually URL, or subdomain)</label>
+          </div>
+          <div class="flex-20">
+          </div>
+      </div>
+      <div formArrayName="integrations" *ngFor="let integration of integrations.controls; let i=index;">
+        
+        <div [formGroupName]="i" class="flex-container">
+          <div>
+            <input type="hidden" name="companyintegrationid" fromControlName="companyintegrationid">
+            <input type="hidden" name="companyid" formControlName="companyid">
+          </div>
+          <div class="flex-40">
+            <select class="select-box" formControlName="systemtypeid">
+              <option *ngFor="let type of systemTypes" value="{{type.systemtypeid}}">{{type.systemtypedesc}}</option>
+            </select>
+          </div>
+          <div class="flex-40">
+            <input type="text" name="integrationidentifier" formControlName="integrationidentifier">
+
+          </div>
+          <div class="flex-20">
+            <button type="button" (click)="removeIntegration(i)" class="btn-no-pad tc">Remove</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <button class="btn-reg cd" type="submit">
+        Submit
+      </button>
+    </div>
+  </fieldset>
+</form>

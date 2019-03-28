@@ -2,27 +2,34 @@ const express = require('express');
 const router = express.Router();
 const CRUDContext = require('./../db/crud.service');
 const companyContext = new CRUDContext('company');
+const companyIntegrationsContext = new CRUDContext('companyIntegration');
+
 
 router.get('/getCompany/:companyId', async (req,res) => {
   ///get company
-  res.send({
-    companyid:1, companycode:"code", companyname:"name"
+  let company = await companyContext.getById({
+    "companyid": req.params.companyId
   })
+  res.send(company)
 });
 
 router.post('/saveCompany', async (req, res) =>{
-  console.log(req.body);
-
   let upsertedCompany = await companyService.upsertCompany(req.body);
   res.send( upsertedCompany )
 });
 
 router.get('/companyIntegrations/:companyId', async (req, res) => {
-
+  let integrations = await companyIntegrationsContext.findAllByCondition({companyid:req.params.companyId})
+  res.send(integrations);
 });
 
 router.post('/saveCompanyIntegrations', async (req, res) => {
-
+  let savedIntegrations = [];
+  for(let integration of req.body.integrations){
+    let savedIntegration = await companyIntegrationsContext.upsert(integration)
+    savedIntegrations.push(savedIntegration)
+  }
+  res.send(savedIntegrations);
 });
 
 let companyService = {

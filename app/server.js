@@ -5,6 +5,8 @@ const graphController = require('./graph/graph.controller')
 
 //crud controllers
 const companyController = require('./controllers/company.controller')
+const systemController = require('./controllers/system.controller');
+
 
 const path = require('path')
 
@@ -51,6 +53,8 @@ app.use(express.static(path.join(__dirname, "public")))
 app.use("/molecule", graphController); 
 // app.user("/user",userController)
 app.use('/company', companyController);
+app.use('/system', systemController);
+
 
 app.listen(port, () => {
   console.log(`Siamo Web App listening on port ${port}`)

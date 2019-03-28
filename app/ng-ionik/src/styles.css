@@ -6,6 +6,20 @@ body{
 .container{
   max-width:1200px;
 }
+.flex-container{
+  display:flex;
+  width:100%;
+  flex-wrap: wrap;
+}
+.flex-40{
+  flex-basis: 37%;
+  flex-shrink: 0;
+  padding:4px 12px;
+}
+.flex-20{
+  flex-basis: 17%;
+  padding:4px 12px;
+}
 
 .link {
   fill: none;
@@ -81,6 +95,14 @@ input {
   padding:.4em;
   border-radius: 5px;
 }
+.select-box{
+  display:block;
+  width:100%;
+  max-width:400px;
+  font-size:12pt;
+  height:44px;
+  border-radius:5px;
+}
 label {
   display: block;
   width:100%;
@@ -96,6 +118,10 @@ button.btn-reg{
   padding:12px 12px;
   margin-top: 15px;
   margin-bottom: 8px;
+}
+
+button.btn-no-pad{
+  padding:12px 12px;
 }
 
 button.btn-sm{

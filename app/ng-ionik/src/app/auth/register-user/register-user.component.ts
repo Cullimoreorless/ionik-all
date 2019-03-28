@@ -18,7 +18,7 @@ export class RegisterUserComponent implements OnInit {
     });
   }
 
-  ngOnInit() { 
+  ngOnInit() {
   }
 
   register(){

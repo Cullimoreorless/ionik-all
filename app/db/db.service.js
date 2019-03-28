@@ -20,9 +20,13 @@ const DBHelper = {
   },
   updateById: async (tableName, idValue, updateValues, columns) => {
     return knex(tableName).where(idValue).update(updateValues).returning(columns);
+  },
+  findAllByCondition: async(tableName, condition, columns) =>{
+    return knex(tableName).where(condition).select(columns);
+  },
+  findAll: async(tableName) =>{
+    return knex(tableName).select('*');
   }
-
-  
 
 }
 
