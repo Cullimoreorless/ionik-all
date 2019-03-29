@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpClientModule} from '@angular/common/http'
+import { HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -14,6 +14,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { RegisterUserComponent } from './auth/register-user/register-user.component';
 import { CompanyIdentifiersComponent } from './crud/company/company-identifiers.component';
 import { CompanyComponent } from './crud/company/company.component';
+import { AuthService } from './services/auth-service.service';
+import { AuthInterceptor } from './services/auth.interceptor';
 
 const routes : Routes = [
   { path: "login", component: LoginComponent },
@@ -50,7 +52,13 @@ const routes : Routes = [
     )
   ],
   providers: [
-    GlobalsService
+    GlobalsService,
+    AuthService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi:true
+    }
   ],
   bootstrap: [AppComponent]
 })

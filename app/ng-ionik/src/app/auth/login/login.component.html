@@ -1,5 +1,5 @@
 <div class="login-container">
-  <div [formGroup]="form" class="login-form wd">
+  <form [formGroup]="form" (ngSubmit)="login()" class="login-form wd">
     <fieldset>
       <legend>Login</legend>
       <div>
@@ -18,5 +18,5 @@
         <button type="submit" class="btn-reg cd">Login</button>
       </div>
     </fieldset>
-  </div>
+  </form>
 </div>

@@ -1,7 +1,9 @@
-const express = require("express")
-const helmet = require('helmet')
-const graphController = require('./graph/graph.controller')
+require('dotenv').load();
+const express = require("express");
+const helmet = require('helmet');
+const graphController = require('./graph/graph.controller');
 // const userController = require('./user/user.controller')
+const authController = require('./controllers/auth.controller');
 
 //crud controllers
 const companyController = require('./controllers/company.controller')
@@ -10,7 +12,6 @@ const systemController = require('./controllers/system.controller');
 
 const path = require('path')
 
-require('dotenv').load();
 const dbConn = {
   user:process.env.IONIKDBUSER,
   password:process.env.IONIKDBPASSWORD,
@@ -54,6 +55,7 @@ app.use("/molecule", graphController);
 // app.user("/user",userController)
 app.use('/company', companyController);
 app.use('/system', systemController);
+app.use('/auth', authController); 
 
 
 app.listen(port, () => {
