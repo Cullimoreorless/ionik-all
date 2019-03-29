@@ -16,14 +16,15 @@ import { CompanyIdentifiersComponent } from './crud/company/company-identifiers.
 import { CompanyComponent } from './crud/company/company.component';
 import { AuthService } from './services/auth-service.service';
 import { AuthInterceptor } from './services/auth.interceptor';
+import { AuthGuard } from './services/auth.guard';
 
 const routes : Routes = [
   { path: "login", component: LoginComponent },
   { path: "register", component: RegisterUserComponent },
-  { path: "company", component: CompanyComponent},
-  { path: "company/:companyId", component: CompanyComponent},
-  { path: "companyIntegration/:companyId", component: CompanyIdentifiersComponent},
-  { path: "network", component: GraphComponent },
+  { path: "company", component: CompanyComponent, canActivate: [AuthGuard]},
+  { path: "company/:companyId", component: CompanyComponent, canActivate: [AuthGuard]},
+  { path: "companyIntegration/:companyId", component: CompanyIdentifiersComponent, canActivate: [AuthGuard]},
+  { path: "network", component: GraphComponent, canActivate: [AuthGuard] },
   { path: '',
     redirectTo: '/network',
     pathMatch: 'full'
@@ -54,6 +55,7 @@ const routes : Routes = [
   providers: [
     GlobalsService,
     AuthService,
+    AuthGuard,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

@@ -6,15 +6,16 @@ const jwt = require('jsonwebtoken');
 router.post('/authenticate', async (req, res) =>{
   let credentials = req.body;
   if(credentials.username === 'test' && credentials.password === 'test'){
-    let expireDate = Math.floor(Date.now() / 1000) + (60 * 60)
+    console.log(Date.now());
+    let expireDate = Math.floor(Date.now()/1000) + (120 * 60)
     let token = jwt.sign({
       cid: 7,
       uid: 1,
-      expiresIn: expireDate
+      expiresAt: expireDate
     }, process.env.SIAMOCOOKIESECRET,
-    { expiresIn:"1h", subject: "1" })
+    { expiresIn:"2h", subject: "1" })
     res.send({success:true,
-      expiresIn: expireDate,
+      expiresAt: expireDate,
       tkn:token});
   }
   else{

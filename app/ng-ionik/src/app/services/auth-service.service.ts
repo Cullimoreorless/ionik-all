@@ -18,7 +18,8 @@ export class AuthService {
 
   private setSession(result){
     console.log('SESSION SETTING')
-    let expiresAt = moment().add(result.expiresIn, 'second')
+    console.log(result.expiresAt)
+    let expiresAt = moment(0).add(result.expiresAt,'second')
     localStorage.setItem('siamo_tkn',result.tkn)
     localStorage.setItem('expires_at',JSON.stringify(expiresAt.valueOf()))
     return (result && result.tkn);
@@ -32,7 +33,11 @@ export class AuthService {
     });
   }
 
-  isLoggedIn(){
+  isLoggedIn() : boolean{
+
+    console.log(this.getExpiration());
+    console.log(moment());
+    console.log(moment().isBefore(this.getExpiration()));
     return moment().isBefore(this.getExpiration())
   }
 
@@ -44,6 +49,7 @@ export class AuthService {
   getExpiration(){
     let expiration = localStorage.getItem("expires_at");
     let expiresAt = JSON.parse(expiration);
+    console.log("Expiration -- " + expiration);
     return moment(expiresAt);
   }
 }
