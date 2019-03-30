@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, ParamMap} from '@angular/router';
+import { ComponentFactoryResolver } from '@angular/core/src/render3';
 
 @Component({
   selector: 'company-identifiers',
@@ -15,7 +16,8 @@ export class CompanyIdentifiersComponent implements OnInit {
     ])
   });
   systemTypes: any;
-  
+  errorMessage:string = "";
+
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
@@ -26,23 +28,20 @@ export class CompanyIdentifiersComponent implements OnInit {
       .subscribe((next) => {
         this.systemTypes= next;
       });
-    this.route.paramMap.subscribe((params : ParamMap) =>{
-      this.companyId = parseInt(params.get('companyid'));
-      this.http.get(`/api/company/companyIntegrations/${params.get('companyId')}`)
-        .subscribe((integrations : Array<any>) => {
-          if(integrations && integrations.length > 0){
-            for(let integration of integrations){
-              this.addIntegration();
-            }
-            this.form.setValue({
-              integrations: integrations
-            });
-          }
-          else{
+    this.http.get(`/api/company/companyIntegrations`)
+      .subscribe((integrations : Array<any>) => {
+        if(integrations && integrations.length > 0){
+          for(let integration of integrations){
             this.addIntegration();
           }
-        });
-    });
+          this.form.setValue({
+            integrations: integrations
+          });
+        }
+        else{
+          this.addIntegration();
+        }
+      });
   }
 
   addIntegration():void {
@@ -60,7 +59,22 @@ export class CompanyIdentifiersComponent implements OnInit {
   }
 
   removeIntegration(i:number):void{
-    this.integrations.controls.splice(i,1)
+    console.log(this.integrations.controls[i].controls.companyintegrationid.value);
+    if(this.integrations.controls[i].controls.companyintegrationid
+         && this.integrations.controls[i].controls.companyintegrationid.value){
+      this.http.get(`/api/company/removeCompanyIntegration/${this.integrations.controls[i].controls.companyintegrationid.value}`)
+        .subscribe((response : any) =>{
+          if(response.success){
+            this.integrations.controls.splice(i,1);
+          }
+          else{
+            this.errorMessage = "Could not remove integration, please try again"
+          }
+        })
+    }
+    else{
+      this.integrations.controls.splice(i,1);
+    }
   }
 
   saveCompanyIntegrations(){

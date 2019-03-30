@@ -16,18 +16,20 @@ const DBHelper = {
     return knex(tableName).insert(insCols).returning(columns);
   },
   findFirstById: async (tableName, idValue, columns) => {
-    return knex(tableName).where(idValue).limit(1).select(columns);
+    return knex(tableName).whereNull('endts').where(idValue).limit(1).select(columns);
   },
   updateById: async (tableName, idValue, updateValues, columns) => {
-    return knex(tableName).where(idValue).update(updateValues).returning(columns);
+    return knex(tableName).whereNull('endts').where(idValue).update(updateValues).returning(columns);
   },
   findAllByCondition: async(tableName, condition, columns) =>{
-    return knex(tableName).where(condition).select(columns);
+    return knex(tableName).whereNull('endts').where(condition).select(columns);
   },
   findAll: async(tableName) =>{
-    return knex(tableName).select('*');
+    return knex(tableName).whereNull('endts').select('*');
   },
-
+  deleteById:async(tableName, idInfo) =>{
+    return knex(tableName).where(idInfo).update({'endts':knex.fn.now()}).returning("*");
+  },
 
   findCompanyByCode: async (companyCode) => {
     return knex('company_name').where({"companycode":companyCode}).limit(1).select(["companyid", "companycode", "companyname"]);

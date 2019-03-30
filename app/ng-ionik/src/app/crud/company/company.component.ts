@@ -25,13 +25,8 @@ export class CompanyComponent implements OnInit {
     private route: ActivatedRoute) { }
 
   ngOnInit() { 
-    let x = this.route.paramMap.pipe(
-      switchMap((params:ParamMap) => 
-        this.http.get(`/api/company/getCompany/${params.get('companyId')}`)
-      )
-    )
-    x.subscribe(next =>
-      this.form.setValue(next));
+    this.http.get(`/api/company/getCompany`)
+      .subscribe(next => this.form.setValue(next));
     // this.form.setValue({companyid:0, companycode:'',companyname:''})
   }
 

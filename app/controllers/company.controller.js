@@ -5,10 +5,9 @@ const companyContext = new CRUDContext('company');
 const companyIntegrationsContext = new CRUDContext('companyIntegration');
 
 
-router.get('/getCompany/:companyId', async (req,res) => {
-  ///get company
+router.get('/getCompany', async (req,res) => {
   let company = await companyContext.getById({
-    "companyid": req.params.companyId
+    "companyid": req.companyId
   })
   res.send(company)
 });
@@ -18,18 +17,27 @@ router.post('/saveCompany', async (req, res) =>{
   res.send( upsertedCompany )
 });
 
-router.get('/companyIntegrations/:companyId', async (req, res) => {
-  let integrations = await companyIntegrationsContext.findAllByCondition({companyid:req.params.companyId})
+router.get('/companyIntegrations', async (req, res) => {
+  let integrations = await companyIntegrationsContext.findAllByCondition({companyid:req.companyId})
   res.send(integrations);
 });
 
 router.post('/saveCompanyIntegrations', async (req, res) => {
   let savedIntegrations = [];
   for(let integration of req.body.integrations){
+    integration.companyid = req.companyId;
     let savedIntegration = await companyIntegrationsContext.upsert(integration)
     savedIntegrations.push(savedIntegration)
   }
   res.send(savedIntegrations);
+});
+
+router.get('/removeCompanyIntegration/:companyIntegrationId', async (req, res) => {
+  if(!req.params.companyIntegrationId){
+    res.send({success:false, message: "No company integration provided"})
+  }
+  let deletionResult = await companyIntegrationsContext.delete({companyintegrationid: req.params.companyIntegrationId})
+  res.send(deletionResult);
 });
 
 router.get('/all', async (req, res) => {

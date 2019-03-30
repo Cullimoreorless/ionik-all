@@ -43,7 +43,7 @@ function CRUDContext(contextId){
       let cols = this.separateColumns();
       let rows = await DBHelper.findAllByCondition(this.ctx.tableName, condition, cols.allCols);
       if(!rows || rows.length < 1){
-        throw new Error(`CRUDContext.findAllByCondition - Could not retrieve ${this.ctx.tableName} records for contiditon ${JSON.stringify(condition)}`)
+        throw new Error(`CRUDContext.findAllByCondition - Could not retrieve ${this.ctx.tableName} records for condition ${JSON.stringify(condition)}`)
       }
       return rows;
     }
@@ -83,6 +83,16 @@ function CRUDContext(contextId){
     }
     return result[0];
   };
+
+  this.delete = async (idInfo) => {
+    try{
+      let result = await DBHelper.deleteById(this.ctx.tableName, idInfo);
+      return {success:true};
+    }
+    catch(err){
+      return {success:false, message: `Could not delete '${this.ctx.tableName}' for id ${JSON.stringify(idInfo)}`};
+    }
+  }
 
   this.separateColumns = (columnVals) =>{
     let result = {

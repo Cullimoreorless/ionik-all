@@ -61,6 +61,16 @@ const identifierMiddleware = async (req, res, next) => {
   next();
 }
 
+const mustHaveCompany = async (req, res, next) => {
+  if(!req.companyId){
+    console.log("CompanyMiddleware - no company could be found on this request")
+    res.sendStatus(403);
+  }
+  else{
+    next();
+  }
+}
+
 app.use(identifierMiddleware);
 
 app.use(helmet())
@@ -71,7 +81,7 @@ app.use(express.static(path.join(__dirname, "public")))
 
 app.use("/molecule", graphController); 
 // app.user("/user",userController)
-app.use('/company', companyController);
+app.use('/company', mustHaveCompany, companyController);
 app.use('/system', systemController);
 app.use('/auth', authController); 
 
