@@ -1,5 +1,5 @@
 <div class="register-user-container">
-  <form [formGroup]="form" class="register-form-container wd">
+  <form [formGroup]="form" (ngSubmit)="registerUser()" class="register-form-container wd">
     <fieldset>
       <legend>
         Create user
@@ -9,6 +9,12 @@
           Username
         </label>
         <input type="text" formControlName="username"/>
+      </div>
+      <div>
+        <label>Company</label>
+        <select class="select-box" formControlName="companyId">
+          <option *ngFor="let c of companies;" value="{{c.companyid}}">{{c.companyname}} ({{c.companycode}})</option>
+        </select>
       </div>
       <div class="field-container">
         <label>
@@ -24,7 +30,7 @@
         <input type="password" formControlName="confirmPassword"/>
       </div>
       <div>
-        <button class="cd btn-reg" type="submit" (click)="register()">Register</button>
+        <button class="cd btn-reg" type="submit" >Register</button>
       </div>
     </fieldset>
   </form>

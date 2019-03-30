@@ -2,6 +2,9 @@
   <form [formGroup]="form" (ngSubmit)="login()" class="login-form wd">
     <fieldset>
       <legend>Login</legend>
+      <div class="error-box" *ngIf="errorMessage">
+        {{errorMessage}}
+      </div>
       <div>
         <label>
           Username

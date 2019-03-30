@@ -15,8 +15,8 @@ const DBHelper = {
   insertToTable: async (tableName, insCols, columns) => {
     return knex(tableName).insert(insCols).returning(columns);
   },
-  findFirstById: async (tableName, idValue) => {
-    return knex(tableName).where(idValue).limit(1).select('*');
+  findFirstById: async (tableName, idValue, columns) => {
+    return knex(tableName).where(idValue).limit(1).select(columns);
   },
   updateById: async (tableName, idValue, updateValues, columns) => {
     return knex(tableName).where(idValue).update(updateValues).returning(columns);
@@ -26,8 +26,15 @@ const DBHelper = {
   },
   findAll: async(tableName) =>{
     return knex(tableName).select('*');
-  }
+  },
 
+
+  findCompanyByCode: async (companyCode) => {
+    return knex('company_name').where({"companycode":companyCode}).limit(1).select(["companyid", "companycode", "companyname"]);
+  },
+  findCompanies: async () => {
+    return knex('company_name').select(["companyid", "companycode", "companyname"])
+  }
 }
 
 module.exports = DBHelper;

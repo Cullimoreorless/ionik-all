@@ -32,6 +32,11 @@ router.post('/saveCompanyIntegrations', async (req, res) => {
   res.send(savedIntegrations);
 });
 
+router.get('/all', async (req, res) => {
+  let companies = await companyContext.findAll();
+  res.send(companies);
+})
+
 let companyService = {
   upsertCompany: async (companyDetails) =>{
     let result = null;

@@ -15,6 +15,11 @@ let CRUDHelpers = {
     tableName:"system_type",
     idColumns:["systemtypeid"],
     updateCols:["systemtypedesc"]
+  },
+  "user":{
+    tableName:"app_user",
+    idColumns:["userid"],
+    updateCols:["pwhash","username","companyid"]
   }
 }
 
@@ -38,7 +43,7 @@ function CRUDContext(contextId){
   this.findAllByCondition= async(condition) =>{
     try{
       let cols = this.separateColumns();
-      let rows = DBHelper.findAllByCondition(this.ctx.tableName, condition, cols.allCols);
+      let rows = await DBHelper.findAllByCondition(this.ctx.tableName, condition, cols.allCols);
       if(!rows || rows.length < 1){
         throw new Error(`CRUDContext.findAllByCondition - Could not retrieve ${this.ctx.tableName} records for contiditon ${JSON.stringify(condition)}`)
       }
