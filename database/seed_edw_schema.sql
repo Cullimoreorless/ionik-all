@@ -175,3 +175,21 @@ from (select distinct companycode, companyname
 from company_name) base
 where base.companycode = dim_company.companycode
 	and base.companyname <> dim_company.companyname;
+
+  insert into edw.dim_company_identifier (companykey, identifiertypekey, identifiercode, identifierdescription, createts)
+select dcomp.companykey, dit.identifiertypekey, cid.systemid, coalesce(cid.systemname, cid.systemdomain), now()
+from company_identifier cid 
+join company_integration cit 
+  on cit.systemid = cid.systemid 
+join company_name cn 
+	on cn.companyid = cit.companyid
+join edw.dim_company dcomp 
+	on dcomp.companycode = cn.companycode
+join system_type st
+	on st.systemtypeid = cid.systemtypeid
+join edw.dim_identifier_type dit 
+	on dit.identifiertype = st.systemtypedesc
+where not exists (select 1 from edw.dim_company_identifier dci
+	where dci.identifiercode = cit.systemid);
+	
+	

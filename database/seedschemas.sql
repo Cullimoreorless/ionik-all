@@ -62,7 +62,7 @@ insert into system_type (systemtypedesc) values ('Outlook Mail');
 
 drop table if exists company_name;
 create table company_name(
-  companyid serial,
+  companyid serial primary key,
   companycode varchar(10),
   companyname text,
   createts timestamp, 
@@ -75,7 +75,9 @@ drop table if exists company_integration;
 create table company_integration(
   companyintegrationid serial,
   companyid int,
+	foreign key (companyid) references company_name (companyid),
   systemtypeid int,
+	foreign key (systemtypeid) references system_type (systemtypeid),
   integrationidentifier text,
   systemid text,
   lastretrievedutc timestamp,
@@ -172,11 +174,17 @@ create table message_info
 
 
 drop table if exists app_user;
-create table app_user (
-	appuserid serial,
-	username varchar(255),
+create table app_user(
+	userid serial,
+	companyid integer,
+	foreign key (companyid) references company_name (companyid),
+	username varchar(200),
 	pwhash text,
+	pwstatus boolean default true,
+	loginattempts smallint default 0,
+	lastattempt timestamp,
 	createts timestamp,
+	updatets timestamp,
 	endts timestamp
 );
 
