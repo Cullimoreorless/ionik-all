@@ -11,7 +11,7 @@ router.post('/authenticate', async (req, res) =>{
   let credentials = req.body;
   try{
     let user = await authService.verifyUser(credentials.username, credentials.password);
-    let expireDate = Math.floor(Date.now()/1000) + (120 * 60)
+    let expireDate = Math.floor(Date.now()/1000) + 30 //+ (120 * 60)
     let token = authService.generateJWT(user.companyid, user.userid, expireDate);
     res.send({success:true,
       expiresAt: expireDate,

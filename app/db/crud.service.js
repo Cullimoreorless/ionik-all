@@ -1,7 +1,5 @@
 let DBHelper = require('./db.service');
 
-
-//TODO: consider the difficulty of connecting front end to tables?
 let CRUDHelpers = {
   "company":{
     tableName:"company_name", 

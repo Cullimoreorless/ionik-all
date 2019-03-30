@@ -1,6 +1,8 @@
 require('dotenv').load();
 const express = require("express");
 const helmet = require('helmet');
+const jwt = require('jsonwebtoken');
+
 const graphController = require('./graph/graph.controller');
 // const userController = require('./user/user.controller')
 const authController = require('./controllers/auth.controller');
@@ -44,6 +46,22 @@ app.use(session({
   }
 }))
 
+const identifierMiddleware = async (req, res, next) => {
+  if(req.headers.authorization){
+    let bearerToken = req.headers.authorization.replace('Bearer ','');
+    try{
+      let decoded = jwt.verify(bearerToken, process.env.SIAMOCOOKIESECRET);
+      req.companyId = decoded.cid;
+      req.userId = decoded.uid;
+    }
+    catch(err){
+      console.error(`Could not decode JWT - ${err.message}`)
+    }
+  }
+  next();
+}
+
+app.use(identifierMiddleware);
 
 app.use(helmet())
 app.use(express.json())

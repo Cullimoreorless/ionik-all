@@ -10,7 +10,7 @@ const generateJWT = (companyId, userId, expireDate) => {
     uid: userId,
     expiresAt: expireDate
   }, process.env.SIAMOCOOKIESECRET,
-  { expiresIn:"2h", subject: userId.toString() })
+  { expiresIn:"1m", subject: userId.toString() })
   return token;
 }
 
