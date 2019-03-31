@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const CRUDContext = require('./../db/crud.service');
 const companyContext = new CRUDContext('company');
-const companyIntegrationsContext = new CRUDContext('companyIntegration');
-
+const companyIntegrationsContext = require('./../db/crud-overrides/companyintegrationcontext');
 
 router.get('/getCompany', async (req,res) => {
   let company = await companyContext.getById({
@@ -38,6 +37,11 @@ router.get('/removeCompanyIntegration/:companyIntegrationId', async (req, res) =
   }
   let deletionResult = await companyIntegrationsContext.delete({companyintegrationid: req.params.companyIntegrationId})
   res.send(deletionResult);
+});
+
+router.get('/listCompanyIntegrations', async (req, res) => {
+  let integrations = await companyIntegrationsContext.getCompanyIntegrationsList(req.companyId);
+  res.send(integrations)
 });
 
 router.get('/all', async (req, res) => {

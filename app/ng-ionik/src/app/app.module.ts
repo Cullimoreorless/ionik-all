@@ -14,6 +14,9 @@ import { Routes, RouterModule } from '@angular/router';
 import { RegisterUserComponent } from './auth/register-user/register-user.component';
 import { CompanyIdentifiersComponent } from './crud/company/company-identifiers.component';
 import { CompanyComponent } from './crud/company/company.component';
+import { PersonIdentifiersComponent } from './crud/person/person-identifiers.component';
+
+
 import { AuthService } from './services/auth-service.service';
 import { AuthInterceptor } from './services/auth.interceptor';
 import { AuthGuard } from './services/auth.guard';
@@ -22,7 +25,7 @@ const routes : Routes = [
   { path: "login", component: LoginComponent },
   { path: "register", component: RegisterUserComponent },
   { path: "company", component: CompanyComponent, canActivate: [AuthGuard]},
-  { path: "company", component: CompanyComponent, canActivate: [AuthGuard]},
+  { path: "person", component: PersonIdentifiersComponent, canActivate: [AuthGuard]},
   { path: "companyIntegration", component: CompanyIdentifiersComponent, canActivate: [AuthGuard]},
   { path: "network", component: GraphComponent, canActivate: [AuthGuard] },
   { path: '',
@@ -39,7 +42,8 @@ const routes : Routes = [
     LoginComponent,
     RegisterUserComponent,
     CompanyIdentifiersComponent,
-    CompanyComponent
+    CompanyComponent,
+    PersonIdentifiersComponent
   ],
   imports: [
     BrowserModule,

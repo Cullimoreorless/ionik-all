@@ -107,7 +107,7 @@ let execute = async (query,params) => {
   // if(!(params instanceof Array)){
   //   params = [params];
   // }
-  console.log("Ionik - executing " + query)
+  console.log("DB - executing " + query)
   const res = await dbClient.query(query, params) 
   console.log("Complete!")
   return res;

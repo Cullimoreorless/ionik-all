@@ -12,8 +12,7 @@ import { ComponentFactoryResolver } from '@angular/core/src/render3';
 export class CompanyIdentifiersComponent implements OnInit {
   companyId : number;
   form: FormGroup = this.fb.group({
-    integrations: this.fb.array([
-    ])
+    integrations: this.fb.array([])
   });
   systemTypes: any;
   errorMessage:string = "";
@@ -59,7 +58,6 @@ export class CompanyIdentifiersComponent implements OnInit {
   }
 
   removeIntegration(i:number):void{
-    console.log(this.integrations.controls[i].controls.companyintegrationid.value);
     if(this.integrations.controls[i].controls.companyintegrationid
          && this.integrations.controls[i].controls.companyintegrationid.value){
       this.http.get(`/api/company/removeCompanyIntegration/${this.integrations.controls[i].controls.companyintegrationid.value}`)

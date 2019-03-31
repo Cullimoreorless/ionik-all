@@ -5,5 +5,7 @@
       <img src="assets/img/SiamoLogoBig.png" width="400" alt="Logo">
   </div>
 </div>
-
+<div *ngIf="isLoggedIn" style="text-align:right;">
+  <button (click)="logout()">logout</button>
+</div>
 <router-outlet></router-outlet>

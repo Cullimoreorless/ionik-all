@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '@/services/auth-service.service';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'register-user',
@@ -12,7 +13,7 @@ export class RegisterUserComponent implements OnInit {
   form: FormGroup 
   companies: any
   constructor(private fb : FormBuilder,
-      private authService : AuthService,
+      private route : Router,
       private http : HttpClient ) {
     this.form = this.fb.group({
       username: ['',Validators.required],
@@ -29,8 +30,10 @@ export class RegisterUserComponent implements OnInit {
   }
 
   registerUser(){
-    this.http.post('/api/auth/registerUser', this.form.value).subscribe((res)=>{
-      console.log(res);
+    this.http.post('/api/auth/registerUser', this.form.value).subscribe((res : any)=>{
+      if(res.success){
+        this.route.navigate(['/login'])
+      }
     });
   }
 

@@ -3,13 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { shareReplay, tap } from 'rxjs/operators';
 import * as moment from 'moment';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+      private route: Router) { }
 
   login(credentials: any){
     return this.http.post('/api/auth/authenticate', credentials)
@@ -44,6 +46,7 @@ export class AuthService {
   logout(){
     localStorage.removeItem("id_token");
     localStorage.removeItem("expires_at");
+    this.route.navigate(['/login'])
   }
 
   getExpiration(){
