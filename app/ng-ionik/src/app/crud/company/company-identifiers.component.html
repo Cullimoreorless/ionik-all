@@ -1,45 +1,41 @@
-
-<form [formGroup]="form" (ngSubmit)="saveCompanyIntegrations()" class="company-integration-form wd">
-  <fieldset>
-    <legend>Company Integrations</legend>
-    <button (click)="addIntegration()" type="button" class="btn-reg">Add Integration</button>
-    <div>
-      <div class="flex-container">
-          <div class="flex-40">
-            <label for="systemType">Type</label>
-          </div>
-          <div class="flex-40">
-            <label for="integrationIdentifier">Identifier (usually URL, or subdomain)</label>
-          </div>
-          <div class="flex-20">
-          </div>
-      </div>
-      <div formArrayName="integrations" *ngFor="let integration of integrations.controls; let i=index;">
-        
-        <div [formGroupName]="i" class="flex-container">
-          <div>
-            <input type="hidden" name="companyintegrationid" fromControlName="companyintegrationid">
-            <input type="hidden" name="companyid" formControlName="companyid">
-          </div>
-          <div class="flex-40">
-            <select class="select-box" formControlName="systemtypeid">
-              <option *ngFor="let type of systemTypes" value="{{type.systemtypeid}}">{{type.systemtypedesc}}</option>
-            </select>
-          </div>
-          <div class="flex-40">
-            <input type="text" name="integrationidentifier" formControlName="integrationidentifier">
-
-          </div>
-          <div class="flex-20">
-            <button type="button" (click)="removeIntegration(i)" class="btn-no-pad tc">Remove</button>
-          </div>
+<div class="row">
+  <div class="col s8 offset-s2">
+    <div class="card">
+      <form [formGroup]="form" (ngSubmit)="saveCompanyIntegrations()" class=" card-content company-integration-form orange lighten-2">
+        <span class="card-title">Company Integrations</span>
+        <button (click)="addIntegration()" type="button" class="btn-reg">Add Integration</button>
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Identifier (usually URL, or subdomain)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody formArrayName="integrations" >
+            <tr *ngFor="let integration of integrations.controls; let i=index;" [formGroupName]="i" >
+              <td>
+                <input type="hidden" name="companyintegrationid" fromControlName="companyintegrationid">
+                <input type="hidden" name="companyid" formControlName="companyid">
+                <select class="select-box" formControlName="systemtypeid">
+                  <option *ngFor="let type of systemTypes" value="{{type.systemtypeid}}">{{type.systemtypedesc}}</option>
+                </select>
+              </td>
+              <td>
+                <input type="text" name="integrationidentifier" formControlName="integrationidentifier">
+              </td>
+              <td>
+                <button type="button" (click)="removeIntegration(i)" class="btn-no-pad tc">Remove</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div>
+          <button class="btn-reg cd" type="submit">
+            Submit
+          </button>
         </div>
-      </div>
+      </form>
     </div>
-    <div>
-      <button class="btn-reg cd" type="submit">
-        Submit
-      </button>
-    </div>
-  </fieldset>
-</form>
+  </div>
+</div>

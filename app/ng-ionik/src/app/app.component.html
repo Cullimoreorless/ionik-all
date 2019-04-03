@@ -1,11 +1,20 @@
 <!--The content below is only a placeholder and can be replaced.-->
 
-<div class="container">
-  <div style="text-align:center">
-      <img src="assets/img/SiamoLogoBig.png" width="400" alt="Logo">
+<nav class="row cyan lighten-2">
+  <div class="row">
+    
+    <div class="col s3 center">
+      <img src="assets/img/SiamoLogoBig.png" width="200" alt="Logo">
+    </div>
+    <div class="col s4 push-s5">
+      <div class="right">
+        <ul id="nav-mobile" class="right hide-on-small-only">
+          <li *ngIf="isLoggedIn" >
+                <a (click)="logout()">logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
-</div>
-<div *ngIf="isLoggedIn" style="text-align:right;">
-  <button (click)="logout()">logout</button>
-</div>
+</nav>
 <router-outlet></router-outlet>

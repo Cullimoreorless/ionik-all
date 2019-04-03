@@ -1,25 +1,29 @@
-<div class="login-container">
-  <form [formGroup]="form" (ngSubmit)="login()" class="login-form wd">
-    <fieldset>
-      <legend>Login</legend>
-      <div class="error-box" *ngIf="errorMessage">
-        {{errorMessage}}
+<div class="container">
+  <div class="row">
+    <div class="centered-content" style="width:350px;">
+      <div class="z-depth-2 card  ">
+        <form [formGroup]="form" (ngSubmit)="login()" class="card-content orange lighten-2">
+          <span class="card-title">Login</span>
+          <div class="error-box" *ngIf="errorMessage">
+            {{errorMessage}}
+          </div>
+          <div>
+            <label>
+              Username
+            </label>
+            <input class="login-text" type="text" formControlName="username" />
+          </div>
+          <div>
+            <label>
+              Password
+            </label>
+            <input class="login-text" type="password" formControlName="password" />
+          </div>
+          <div class="center">
+            <button type="submit" class="btn cd">Login</button>
+          </div>
+        </form>
       </div>
-      <div>
-        <label>
-          Username
-        </label>
-        <input class="login-text" type="text" formControlName="username" />
-      </div>
-      <div>
-        <label>
-          Password
-        </label>
-        <input class="login-text" type="password" formControlName="password" />
-      </div>
-      <div>
-        <button type="submit" class="btn-reg cd">Login</button>
-      </div>
-    </fieldset>
-  </form>
+    </div>
+  </div>
 </div>

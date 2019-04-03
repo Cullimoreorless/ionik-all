@@ -1,19 +1,22 @@
-<div class="company-container">
-  <form [formGroup]="form" (ngSubmit)="saveCompany()" class="company-form wd">
-    <fieldset>
-      <legend>Company</legend>
-      <input type="hidden" formControlName="companyid" />
-      <div>
-        <label for="companyCode">Company Code</label>
-        <input type="text" class="company-text" formControlName="companycode" />
+<div class="row">
+  <div class="centered-content " style="width:350px">
+    <div class="card">
+        <form [formGroup]="form" (ngSubmit)="saveCompany()" class="card-content orange lighten-2">
+          
+            <span class="card-title">Company</span>
+            <input type="hidden" formControlName="companyid" />
+            <div>
+              <label for="companyCode">Company Code</label>
+              <input type="text" class="company-text" formControlName="companycode" />
+            </div>
+            <div>
+              <label for="companyName">Company Name</label>
+              <input type="text" class="company-text" formControlName="companyname" />
+            </div>
+            <div>
+              <button type="submit" class="btn-reg cd">Save</button>
+            </div>
+        </form> 
       </div>
-      <div>
-        <label for="companyName">Company Name</label>
-        <input type="text" class="company-text" formControlName="companyname" />
-      </div>
-      <div>
-        <button type="submit" class="btn-reg cd">Save</button>
-      </div>
-    </fieldset>
-  </form> 
+  </div>
 </div>

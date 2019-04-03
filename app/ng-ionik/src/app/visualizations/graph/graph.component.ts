@@ -187,8 +187,8 @@ export class GraphComponent implements OnInit {
 
   getColorTransform(){
     let domainLength = this.colorArray.length;
-    let colorRange :any= [d3.hcl(this.GLOBALS.coolDark),
-                d3.hcl(this.GLOBALS.warmDark)]
+    let colorRange :any= [d3.hcl(this.GLOBALS.coolDark).toString(),
+                d3.hcl(this.GLOBALS.warmDark).toString()]
     console.log(colorRange)
     return d3.scaleLinear()
       .domain([0,domainLength-1])
