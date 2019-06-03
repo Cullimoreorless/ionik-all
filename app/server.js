@@ -35,16 +35,16 @@ const pgSess = require('connect-pg-simple')(session);
 
 let pgSessPool = pgConn.Pool(dbConn);
 
-app.use(session({
-  store:new pgSess({
-    pool:pgSessPool
-  }),
-  secret:process.env.SIAMOCOOKIESECRET,
-  resave:false,
-  cookie:{
-    maxAge: 1000 * 60 * 60
-  }
-}))
+// app.use(session({
+//   store:new pgSess({
+//     pool:pgSessPool
+//   }),
+//   secret:process.env.SIAMOCOOKIESECRET,
+//   resave:false,
+//   cookie:{
+//     maxAge: 1000 * 60 * 60
+//   }
+// }))
 
 const identifierMiddleware = async (req, res, next) => {
   if(req.headers.authorization){
@@ -69,7 +69,7 @@ const mustHaveCompany = async (req, res, next) => {
   else{
     next();
   }
-}
+};
 
 app.use(identifierMiddleware);
 

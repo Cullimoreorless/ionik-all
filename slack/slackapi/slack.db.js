@@ -1,11 +1,20 @@
-const {Client, Pool} = require('pg')
+const {Client, Pool} = require('pg');
+require('dotenv').config();
 const dbClient = new Pool({
-  user:process.env.IONIKDBUSER,
-  password:process.env.IONIKDBPASSWORD,
-  host:process.env.IONIKDBHOST,
-  database:process.env.IONIKDBDATABASE,
-  port:process.env.IONIKDBPORT
+  user:process.env.PGUSER,
+  password:process.env.PGPASSWORD,
+  host:process.env.PGHOST,
+  database:process.env.PGDATABASE,
+  port:process.env.PGPORT
 });
+
+// const dbClient = new Client({
+//   user:'siadmin',
+//   password:'CAMAC04022019!',
+//   host:'localhost',
+//   database:'siamo',
+//   port:5432
+// });
 
 const queries = {
   saveUsers : "insert into stg.slack_user (userdata, transactionuuid) VALUES ($1,$2)",
@@ -24,15 +33,15 @@ let execute = async (query,params) => {
   if(!(params instanceof Array)){
     params = [params];
   }
-  console.log("Ionik - executing " + query)
-  const res = await dbClient.query(query, params) 
-  console.log("Complete!")
+  console.log("Ionik - executing " + query);
+  const res = await dbClient.query(query, params);
+  console.log("Complete!");
   return res;
 };
 
 const db = {
   queries: queries,
   executeQuery : execute
-}
+};
 
 module.exports=db;
