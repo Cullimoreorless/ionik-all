@@ -92,22 +92,27 @@ const getUserData = async (transactionUUID) => {
   return userRes
 };
 
-const getChannelData = async (transactionUUID) => {
+const getChannelData = async (transactionUUID, lastExecutionTs) => {
   let conversations;
+  if(!lastExecutionTs)
+  {
+    lastExecutionTs = 0;
+  }
   try{
     conversations = await makeApiCall("conversations.list",{});
     for(channel of conversations.channels){
       let insRes = await db.executeQuery(db.queries.saveChannelDetails,
           [channel.id, channel.num_members, transactionUUID])
-      let channelMembers = await makeApiCall("conversations.members",{
+      let channelMembers = await makePaginatedApiCall("conversations.members",{
         channel:channel.id
-      });
+      }, 100,[]);
       db.executeQuery(db.queries.saveChannelMembers,
           [channel.id, JSON.stringify(channelMembers.members), transactionUUID]);
       hasMoreMessages = true;
 
       let conversationHistory = await makePaginatedApiCall("conversations.history",{
-        channel: channel.id
+        channel: channel.id,
+        oldest: lastExecutionTs
       }, 20, []);
       db.executeQuery(db.queries.saveMessages, [channel.id, JSON.stringify(conversationHistory), transactionUUID]);
     }
@@ -121,10 +126,19 @@ const getChannelData = async (transactionUUID) => {
 
 async function runIntegration()
 {
-  let transactionUUID = uuid();
+  const transactionUUID = uuid();
+  const teamId = await getCompanyData(transactionUUID);
+  const pastExecQueryResult = await db.executeQuery(db.queries.getLastExecutionTS, [teamId]);
+  let lastExecutionts = null;
+  const thisExecutionTS = new Date();
+
+  if(pastExecQueryResult && pastExecQueryResult.rows && pastExecQueryResult.rows[0] && pastExecQueryResult.rows[0].executionts)
+  {
+    lastExecutionts = pastExecQueryResult.rows[0].executionts;
+  }
   await getUserData(transactionUUID);
-  await getChannelData(transactionUUID);
-  await getCompanyData(transactionUUID);
+  await getChannelData(transactionUUID, lastExecutionts);
+  await db.executeQuery(db.queries.saveIntegrationRecord, [teamId, transactionUUID, thisExecutionTS]);
 }
 
 const slackClient = {
