@@ -1,6 +1,13 @@
 
 create schema if not exists stg;
 
+--drop table if exists stg.slack_config
+create table stg.slack_config
+(
+	teamid varchar(20),
+	transactionid varchar(50),
+	executionts timestamp
+);
 -- drop table if exists stg.slack_user;
 create table stg.slack_user
   (
