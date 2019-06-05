@@ -73,7 +73,6 @@ async function makePaginatedApiCall(apiName, config, limit, result)
 const getCompanyData = async (transactionUUID) => {
   let teamId='';
   const companyRes = await makeApiCall("team.info",{});
-  console.log(JSON.stringify(companyRes));
   if(companyRes && companyRes.team && companyRes.team.id)
   {
     teamId = companyRes.team.id
@@ -113,7 +112,6 @@ const getChannelData = async (transactionUUID, lastExecutionTs) => {
           [channel.id, JSON.stringify(channelMembers.members), transactionUUID]);
       hasMoreMessages = true;
 
-      console.log('oldest', lastExecutionTs);
       let conversationHistory = await makePaginatedApiCall("conversations.history",{
         channel: channel.id,
         oldest: lastExecutionTs
@@ -150,7 +148,8 @@ async function runIntegration()
 }
 
 function scheduleIntegration(){
-  cron.schedule("20,40,59 * * * * *", () => {
+  //repeats at 2AM
+  cron.schedule("* * 2 * *", () => {
     runIntegration();
   });
   isIntegrationScheduled = true;
