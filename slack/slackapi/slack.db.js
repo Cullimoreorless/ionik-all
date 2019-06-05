@@ -27,8 +27,8 @@ const queries = {
   updateCompanyIdentifier:`update company_identifiers 
   set lastretrieved = now(), name = $1
   WHERE systemid = $2`,
-  getLastExecutionTS: 'select extract(epoch from executionts) as executionts from stg.slack_config where teamid = $1 order by executionts desc limit 1',
-  saveIntegrationRecord: 'insert into stg.slack_config (teamid, transactionid, executionts) VALUES ($1, $2, $3)'
+  getLastExecutionTS: 'select executionunixts from stg.slack_config where teamid = $1 order by executionunixts desc limit 1',
+  saveIntegrationRecord: 'insert into stg.slack_config (teamid, transactionid, executionunixts) VALUES ($1, $2, $3)'
 };
 
 let execute = async (query,params) => {

@@ -1,8 +1,11 @@
 const db = require('./slack.db');
 const uuid = require('uuid');
+const cron = require('node-cron')
 
 const client_id = process.env.SLACKCLIENTID;
 const client_secret = process.env.SLACKCLIENTSECRET;
+
+let isIntegrationScheduled = false;
 
 const {WebClient} = require("@slack/client")
 let sc = new WebClient("");
@@ -110,6 +113,7 @@ const getChannelData = async (transactionUUID, lastExecutionTs) => {
           [channel.id, JSON.stringify(channelMembers.members), transactionUUID]);
       hasMoreMessages = true;
 
+      console.log('oldest', lastExecutionTs);
       let conversationHistory = await makePaginatedApiCall("conversations.history",{
         channel: channel.id,
         oldest: lastExecutionTs
@@ -130,15 +134,26 @@ async function runIntegration()
   const teamId = await getCompanyData(transactionUUID);
   const pastExecQueryResult = await db.executeQuery(db.queries.getLastExecutionTS, [teamId]);
   let lastExecutionts = null;
-  const thisExecutionTS = new Date();
+  const thisExecutionTS = (Date.now() / 1000);
 
-  if(pastExecQueryResult && pastExecQueryResult.rows && pastExecQueryResult.rows[0] && pastExecQueryResult.rows[0].executionts)
+  if(pastExecQueryResult && pastExecQueryResult.rows && pastExecQueryResult.rows[0] && pastExecQueryResult.rows[0].executionunixts)
   {
-    lastExecutionts = pastExecQueryResult.rows[0].executionts;
+    lastExecutionts = pastExecQueryResult.rows[0].executionunixts;
   }
   await getUserData(transactionUUID);
   await getChannelData(transactionUUID, lastExecutionts);
   await db.executeQuery(db.queries.saveIntegrationRecord, [teamId, transactionUUID, thisExecutionTS]);
+  if(!isIntegrationScheduled)
+  {
+    scheduleIntegration();
+  }
+}
+
+function scheduleIntegration(){
+  cron.schedule("20,40,59 * * * * *", () => {
+    runIntegration();
+  });
+  isIntegrationScheduled = true;
 }
 
 const slackClient = {
