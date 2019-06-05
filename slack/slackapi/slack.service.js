@@ -149,7 +149,7 @@ async function runIntegration()
 
 function scheduleIntegration(){
   //repeats at 2AM
-  cron.schedule("* * 2 * *", () => {
+  cron.schedule("* * 2,14 * *", () => {
     runIntegration();
   });
   isIntegrationScheduled = true;

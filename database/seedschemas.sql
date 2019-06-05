@@ -6,8 +6,9 @@ create table stg.slack_config
 (
 	teamid varchar(20),
 	transactionid varchar(50),
-	executionts timestamp
+	executionunixts decimal(18,6)
 );
+
 -- drop table if exists stg.slack_user;
 create table stg.slack_user
   (
