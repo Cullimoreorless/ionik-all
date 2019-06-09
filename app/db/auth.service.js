@@ -36,7 +36,7 @@ const verifyUser = async (username, password) =>{
   userFromDB = userFromDB[0];
   if(userFromDB.userid)
   {
-    userFromDB.roles = getUserRoles(userFromDB.userid);
+    userFromDB.roles = await getUserRoles(userFromDB.userid);
   }
   if(!bcrypt.compareSync(password, userFromDB.pwhash))
     throw new Error(`Incorrect password`);
