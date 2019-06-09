@@ -5,7 +5,7 @@ const dbConn = {
   database:process.env.IONIKDBDATABASE,
   port:process.env.IONIKDBPORT
 }; 
-const {Client} = require('pg-parameters')
+const {Client} = require('pg-parameters');
 const knex = require('knex')({
   client:'pg',
   connection: dbConn
@@ -42,11 +42,11 @@ const DBHelper = {
 
   
   executeQuery: async(query, params) =>{
-    console.log("DB - executing " + query)
-    const res = await dbClient.query(query, params) 
-    console.log("Complete!")
+    console.log("DB - executing " + query);
+    const res = await dbClient.query(query, params);
+    console.log("Complete!");
     return res;
   }
-}
+};
 
 module.exports = DBHelper;
