@@ -30,8 +30,6 @@ app.set('views',path.join(__dirname, "/views"))
 
 //setup session store usage
 const pgConn = require('pg');
-const session = require('express-session');
-const pgSess = require('connect-pg-simple')(session);
 
 let pgSessPool = pgConn.Pool(dbConn);
 

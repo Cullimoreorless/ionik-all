@@ -55,6 +55,37 @@ create table stg.slack_workspace
 	transactionuuid text
 );
 
+create table stg.slack_etl_transactions
+(
+	transactionuuid varchar(40),
+	beginunixts decimal(18,6),
+	completedunixts decimal(18,6),
+	messages text
+);
+create or replace view stg.vw_slack_user_info as
+select
+	transactionuuid,
+	userdata#>>'{"id"}' as systemid,
+	userdata#>>'{"name"}' as systemname,
+	userdata#>>'{"tz_label"}' as timezonename,
+	userdata#>>'{"tz"}' as timezone,
+	userdata#>>'{"real_name"}' as friendlyname,
+	(userdata#>>'{"tz_offset"}')::int as timezoneoffset,
+	(userdata#>>'{"tz_offset"}')::interval as timezoneoffsetinterval,
+	userdata#>>'{"team_id"}' as teamid,
+	(userdata#>>'{"deleted"}')::boolean as isdeleted,
+	(userdata#>>'{"is_bot"}')::boolean as isbot,
+	(userdata#>>'{"profile","first_name"}') as firstname,
+	(userdata#>>'{"profile","last_name"}') as lastname,
+	(userdata#>>'{"profile","email"}') as email,
+	(userdata#>>'{"profile","image_32"}') as imageurl,
+
+	to_timestamp((userdata#>>'{"updated"}')::bigint) at time zone 'utc' as utcupdatets,
+	(to_timestamp((userdata#>>'{"updated"}')::bigint) at time zone 'utc' + (userdata#>>'{"tz_offset"}')::interval) as localupdatets
+from (
+select jsonb_array_elements(userdata::jsonb) as userdata, transactionuuid
+from stg.slack_user ) base ;
+
 
 --SCHEMA: public
 
@@ -65,6 +96,7 @@ create table system_type
 	systemtypedesc varchar(100)
 );
 
+insert into system_type (systemtypedesc) values ('Siamo');
 insert into system_type (systemtypedesc) values ('Slack');
 insert into system_type (systemtypedesc) values ('Outlook Mail');
 
@@ -183,7 +215,7 @@ create table message_info
 
 drop table if exists app_user;
 create table app_user(
-	userid serial,
+	userid serial primary key,
 	companyid integer,
 	foreign key (companyid) references company_name (companyid),
 	username varchar(200),
@@ -194,6 +226,24 @@ create table app_user(
 	createts timestamp,
 	updatets timestamp,
 	endts timestamp
+);
+
+create table public.app_role
+(
+	approleid serial primary key,
+	approlename varchar(20)
+);
+insert into public.app_role (approlename)
+	values ('SystemAdmin');
+insert into public.app_role (approlename)
+	values ('CompanyAdmin');
+create table public.app_user_role
+(
+	appuserroleid serial primary key,
+	approleid integer,
+	foreign key (approleid) references app_role (approleid),
+	userid integer,
+	foreign key (userid) references app_user (userid)
 );
 
 create or replace function public.is_outside_work_hours(ts timestamp) returns boolean as $$
