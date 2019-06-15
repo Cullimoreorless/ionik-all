@@ -246,6 +246,26 @@ create table public.app_user_role
 	foreign key (userid) references app_user (userid)
 );
 
+alter table public.company_identifier
+ add column companyid integer;
+alter table public.company_identifier
+ add constraint fk_company_identifier_companyid foreign key (companyid) references company_name (companyid);
+
+
+ create or replace view public.vw_company_list as
+ select companyid, companycode, companyname,
+ companyname || ' (' || coalesce(companycode, 'no code given') || ')' as compoundname
+ from company_name
+ where companyname is not null;
+
+drop view if exists public.vw_company_integrations_list;
+create or replace view public.vw_company_integrations_list as
+select companyidentifierid, ci.systemtypeid, systemname, systemdomain , st.systemtypedesc, ci.companyid,
+  systemname || ' (' || coalesce(st.systemtypedesc, 'Unknown type') || ': ' || coalesce(systemdomain, 'no other information)')
+  || ')' as compoundname
+from company_identifier ci
+join system_type st on ci.systemtypeid = st.systemtypeid;
+
 create or replace function public.is_outside_work_hours(ts timestamp) returns boolean as $$
 declare tsdecimaltime numeric = extract(hour from ts) + (extract(min from ts) / 60.000);
 declare tsdow numeric = extract(dow from ts);

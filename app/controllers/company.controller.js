@@ -7,7 +7,7 @@ const companyIntegrationsContext = require('./../db/crud-overrides/companyintegr
 router.get('/getCompany', async (req,res) => {
   let company = await companyContext.getById({
     "companyid": req.companyId
-  })
+  });
   res.send(company)
 });
 
