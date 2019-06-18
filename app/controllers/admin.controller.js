@@ -18,4 +18,24 @@ router.get('/getUnassociatedIntegrations', async (req, res) => {
     res.send(integrations);
 });
 
+router.get('/getCompanyIntegrations/:companyId', async (req, res) => {
+    if(req.params && req.params.companyId) {
+        const existingIntegrations = await adminService.getCompanyIntegrations(req.params.companyId);
+        res.send(existingIntegrations);
+    }
+    else {
+        res.send([]);
+    }
+});
+
+router.post('/saveCompanyAssociation', async (req, res) => {
+    const result = await adminService.saveCompanyAssociation(req.body);
+    res.send(result);
+});
+
+router.post('/deassociateIntegration', async (req, res) => {
+   const result = await adminService.deassociateIntegration(req.body);
+   res.send(result);
+});
+
 module.exports = router;
