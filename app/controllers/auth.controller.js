@@ -30,13 +30,27 @@ router.post('/registerUser', async (req, res) => {
   //TODO: check username for uniqueness
   let passwordHash = authService.generatePasswordHash(newCredentials.password);
 
-  let newUser = await userCtx.upsert({companyid: newCredentials.companyId, 
+  let newUser = await userCtx.upsert({companyid: newCredentials.companyid ? newCredentials.companyid : null,
     pwhash:passwordHash,
     username:newCredentials.username});
 
+  const successfulUserAdd = (newUser && newUser.userid);
+  if(successfulUserAdd)
+  {
+    ////todo: roles add
+    if(newCredentials.companyid)
+    {
+      authService.addRole(newUser.userid, 'CompanyAdmin');
+    }
+    else
+    {
+      authService.addRole(newUser.userid, 'SystemAdmin');
+    }
+  }
+
   res.send({
-    success: newUser && newUser.userid,
-    message: (newUser && newUser.userid) ? "Registered user" : "Could not register user"
+    success: successfulUserAdd,
+    message: successfulUserAdd ? "Registered user" : "Could not register user"
   });
 })
 

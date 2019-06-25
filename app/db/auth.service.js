@@ -14,6 +14,9 @@ from app_user au
  where au.userid = :userId
  group by au.userid`;
 
+const addRoleQuery = `insert into app_user_role (userid, approleid)
+  VALUES (:userId, (select approleid from app_role where approlename = :roleName limit 1))`;
+
 const generateJWT = (companyId, userId, userRoles, expireDate) => {
   let token = jwt.sign({
     cid: companyId,
@@ -51,9 +54,15 @@ const verifyUser = async (username, password) =>{
   
 };
 
+const addRole = async (userId, roleName) => {
+  let insertRole = await db.executeQuery(addRoleQuery, {userId, roleName});
+  console.log(insertRole);
+  return insertRole;
+}
+
 const getUserRoles = async (userId) =>
 {
-  let roleRes = await db.executeQuery(getUserRoleQuery, {userId: userId})
+  let roleRes = await db.executeQuery(getUserRoleQuery, {userId: userId});
   if(roleRes && roleRes[0] && roleRes[0].roles)
   {
     return roleRes[0].roles;
@@ -65,5 +74,6 @@ const getUserRoles = async (userId) =>
 module.exports = {
   generateJWT: generateJWT,
   generatePasswordHash: generatePasswordHash,
-  verifyUser: verifyUser
+  verifyUser: verifyUser,
+  addRole: addRole
 };
