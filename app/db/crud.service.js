@@ -42,6 +42,7 @@ function CRUDContext(contextId){
     try{
       let cols = this.separateColumns();
       let rows = await DBHelper.findAllByCondition(this.ctx.tableName, condition, cols.allCols);
+      console.log(rows);
       if(!rows || rows.length < 1){
         throw new Error(`CRUDContext.findAllByCondition - Could not retrieve ${this.ctx.tableName} records for condition ${JSON.stringify(condition)}`)
       }

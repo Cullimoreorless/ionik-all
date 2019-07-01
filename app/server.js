@@ -11,6 +11,7 @@ const adminController = require('./controllers/admin.controller');
 //crud controllers
 const companyController = require('./controllers/company.controller');
 const systemController = require('./controllers/system.controller');
+const companyAdminController = require('./controllers/company-admin.controller');
 
 
 const path = require('path')
@@ -83,6 +84,7 @@ app.use('/company', companyController);
 app.use('/system', systemController);
 app.use('/auth', authController); 
 app.use('/admin', adminController);
+app.use('/companyAdmin', companyAdminController);
 
 app.listen(port, () => {
   console.log(`Siamo Web App listening on port ${port}`)

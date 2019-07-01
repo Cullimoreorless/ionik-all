@@ -3,6 +3,7 @@ const router = express.Router();
 const CRUDContext = require('./../db/crud.service');
 const companyContext = new CRUDContext('company');
 const companyIntegrationsContext = require('./../db/crud-overrides/companyintegrationcontext');
+const adminService = require('./../db/admin.service');
 
 router.get('/getCompany', async (req,res) => {
   let company = await companyContext.getById({
@@ -17,8 +18,15 @@ router.post('/saveCompany', async (req, res) =>{
 });
 
 router.get('/companyIntegrations', async (req, res) => {
-  let integrations = await companyIntegrationsContext.findAllByCondition({companyid:req.companyId})
-  res.send(integrations);
+  if(req.params && req.companyId) {
+    const existingIntegrations = await adminService.getCompanyIntegrations(req.companyId);
+    res.send(existingIntegrations);
+  }
+  else {
+    res.send([]);
+  }
+  // let integrations = await companyIntegrationsContext.findAllByCondition({companyid:req.companyId})
+  // res.send(integrations);
 });
 
 router.post('/saveCompanyIntegrations', async (req, res) => {
