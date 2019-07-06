@@ -6,3 +6,4 @@ slack/package-lock.json
 **/.gitignore
 **/README.md
 **/.idea
+**/uploads/**

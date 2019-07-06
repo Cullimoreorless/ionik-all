@@ -2,6 +2,7 @@ require('dotenv').load();
 const express = require("express");
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
+const fileUpload = require('express-fileupload');
 
 const graphController = require('./graph/graph.controller');
 // const userController = require('./user/user.controller')
@@ -72,8 +73,14 @@ const mustHaveCompany = async (req, res, next) => {
 
 app.use(identifierMiddleware);
 
-app.use(helmet())
-app.use(express.json())
+app.use(helmet());
+app.use(express.json());
+app.use(fileUpload({
+  limits:{ fileSize: 50 * 1024 * 1024 },
+  useTempFiles:true,
+  tempFileDir: '/tmp/',
+  createParentPath: true
+}));
 const port = process.env.PORT ||3000;
 
 app.use(express.static(path.join(__dirname, "public")))
