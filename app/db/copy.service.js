@@ -7,27 +7,37 @@ const dbConn = {
     port:process.env.IONIKDBPORT
 };
 const copyTo = require('pg-copy-streams').to;
+const copyFrom = require('pg-copy-streams').from;
 
 const pool = new Pool(dbConn);
 
-const getCopyStream = async (query, res) => {
+const getCopyStream = async (query) => {
     return new Promise((resolve, reject) => {
             pool.connect(async (err, client, callback) => {
                 if(err)
                 {
                     reject(err);
                 }
-                // console.log(client);
                 let stream = await client.query(copyTo(query));
-                // console.log(stream);
                 stream.pipe(process.stdout);
-                // stream.on('error', done);
-                // stream.on('end', done);
-                // console.log(stream);
-                // stream.pipe(res);
                 resolve(stream);
             })
         });
+};
+
+const copyFileIntoDB = async (filePath, tableName) => {
+    return new Promise((resolve, reject) => {
+        pool.connect(async (err, client, cb) => {
+            if(err){
+                reject(err);
+            }
+            const copier = copyFrom(`copy ${tableName} from '${filePath}' with csv header;`);
+            copier.cb_flush = () => {};
+            let copyResult = client.query(copier);
+            console.log(copyResult);
+            resolve(copyResult);
+        })
+    })
 };
 
 const done = (err) => {
@@ -42,4 +52,4 @@ const done = (err) => {
     }
 };
 
-module.exports = {getCopyStream};
+module.exports = {getCopyStream, copyFileIntoDB};

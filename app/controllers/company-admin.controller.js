@@ -60,9 +60,16 @@ router.post('/uploadUsers', async (req, res) => {
             {
                 fs.mkdirSync(savePath);
             }
-            req.files.userFile.mv(`${__dirname}/../uploads/${req.companyId}/${req.files.userFile.name}`, (err) => {
+            const fullPathWithFile = `${__dirname}/../uploads/${req.companyId}/${req.files.userFile.name}`;
+            req.files.userFile.mv(fullPathWithFile, async (err) => {
                 if (err) {
                     res.status(500).send(err);
+                }
+                try {
+                    await copyService.copyFileIntoDB(fullPathWithFile, 'stg.stg_demographic_information');
+                }
+                catch(error){
+                    res.status(500).send(error);
                 }
                 res.send({success: true, message: 'file uploaded'});
             });

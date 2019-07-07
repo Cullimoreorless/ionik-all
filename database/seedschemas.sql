@@ -251,6 +251,21 @@ alter table public.company_identifier
 alter table public.company_identifier
  add constraint fk_company_identifier_companyid foreign key (companyid) references company_name (companyid);
 
+create table public.person_information
+(
+	personid serial primary key,
+	personcode varchar(25) unique,
+	companyid integer,
+	firstname varchar(150),
+	lastname varchar(250),
+	gender varchar(10),
+	email varchar(200),
+	birthday date,
+	foreign key (companyid) references company_name(companyid)
+);
+
+grant pg_read_server_files to siadmin;
+
 
  create or replace view public.vw_company_list as
  select companyid, companycode, companyname,
