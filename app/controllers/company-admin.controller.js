@@ -5,6 +5,7 @@ const copyService = require('./../db/copy.service');
 
 const moment = require('moment');
 const fs = require('fs');
+const db = require('../db/db.service');
 
 router.get('/getUsers/:companyIntegrationId', async (req, res) => {
     if(req.params.companyIntegrationId)
@@ -26,7 +27,8 @@ router.get('/getUsers/:companyIntegrationId', async (req, res) => {
                               pinf.firstname as "First Name",
                               pinf.lastname as "Last Name",
                               pinf.gender as "Gender",
-                              pinf.email as "Email"
+                              pinf.email as "Email",
+                              pinf.birthday as "Birthday"
                             from person_identifier pid 
                             join company_identifier cid 
                               on cid.companyidentifierid = pid.companyidentifierid
@@ -66,7 +68,8 @@ router.post('/uploadUsers', async (req, res) => {
                     res.status(500).send(err);
                 }
                 try {
-                    await copyService.copyFileIntoDB(fullPathWithFile, 'stg.stg_demographic_information');
+                    let copyRes = await copyService.copyFileIntoDB(fullPathWithFile, 'stg.stg_demographic_information');
+                    db.executeQuery("select public.update_demographic_information();",[]);
                 }
                 catch(error){
                     res.status(500).send(error);

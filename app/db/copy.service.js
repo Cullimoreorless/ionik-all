@@ -34,7 +34,6 @@ const copyFileIntoDB = async (filePath, tableName) => {
             const copier = copyFrom(`copy ${tableName} from '${filePath}' with csv header;`);
             copier.cb_flush = () => {};
             let copyResult = client.query(copier);
-            console.log(copyResult);
             resolve(copyResult);
         })
     })

@@ -42,10 +42,14 @@ const DBHelper = {
 
   
   executeQuery: async(query, params) =>{
-    console.log("DB - executing " + query);
-    const res = await dbClient.query(query, params);
-    console.log("Complete!");
-    return res;
+    try{
+      const res = await dbClient.query(query, params);
+      return res;
+    }
+    catch(err)
+    {
+      console.error('Sql error - ', err)
+    }
   }
 };
 
