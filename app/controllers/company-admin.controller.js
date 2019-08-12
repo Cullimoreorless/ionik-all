@@ -159,7 +159,9 @@ router.post('/uploadUserGroups', async (req, res) => {
 
                     let copyRes = await copyService.copyFileIntoDB(filePath, tableName);
 
-                    // let deleteQuery = await db.executeQuery('drop table if exists ' + tableName);
+                    let importQuery = await db.executeQuery('select public.import_person_group(:tableName, :companyId);',
+                        {tableName:tableName, companyId:req.companyId});
+                    let deleteQuery = await db.executeQuery('drop table if exists ' + tableName);
                     res.send({'uploaded':'uploaded'})
                 }
                 catch(copyError)
