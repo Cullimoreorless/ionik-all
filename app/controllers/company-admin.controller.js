@@ -49,6 +49,21 @@ router.get('/getUsers/:companyIntegrationId', async (req, res) => {
     // res.sendStatus(200);
 });
 
+const getUploadPath = (file, companyId) => {
+
+    let savePath = `${__dirname}/../uploads`;
+    if(!fs.existsSync(savePath))
+    {
+        fs.mkdirSync(savePath)
+    }
+    savePath += `/${companyId}`;
+    if(!fs.existsSync(savePath))
+    {
+        fs.mkdirSync(savePath);
+    }
+    return `${__dirname}/../uploads/${companyId}/${file.name}`;
+};
+
 router.post('/uploadUsers', async (req, res) => {
     if(req.files && req.files.userFile) {
         try {
@@ -79,6 +94,84 @@ router.post('/uploadUsers', async (req, res) => {
         }
         catch(error){
             res.status(500).send(error);
+        }
+    }
+    else
+    {
+        req.status(500).send('File not detected');
+    }
+});
+
+
+router.get('/downloadUserGroups', async (req, res) => {
+    try {
+        const currentDate = moment();
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename=SiamoUsers.csv');
+        res.setHeader('File-Name', `Siamo-User-Groups-${currentDate.format('MM-DD-YYYY')}.csv`);
+
+        let stream = await copyService.getCopyStream(`copy (
+                            select pinfo.personcode as "Person Code (DO NOT CHANGE)",
+                               coalesce(grps.grouptype, 'Location') as "Type (examples: Location, Department, Project Team...)",
+                               coalesce(grps.groupcode, 'ExampleCode') as "Code",
+                               coalesce(grps.groupname, 'Example Name') as "Name",
+                               coalesce(grps.startdate, '1990-01-01') as "Start Date"
+                            from person_information pinfo
+                            left join (select personid, companyid, 'Location' as grouptype, 
+                                  locationcode as groupcode, 
+                                  locationname as groupname,
+                                  to_char(startdate, 'YYYY-mm-dd') as startdate
+                               from public.person_location
+                               where companyid = ${+req.companyId}
+                                  union 
+                                  select personid, companyid, grouptype, groupcode, groupname,
+                                  to_char(startdate, 'YYYY-mm-dd') as startdate
+                                from public.person_group
+                                where companyid = ${+req.companyId}) grps on grps.personid = pinfo.personid
+                                  where pinfo.companyid = ${+req.companyId}  ) to stdout with csv header;`);
+        stream.pipe(res);
+    }
+    catch(error){
+        console.error('downloadUserGroups - ', error);
+    }
+
+});
+
+router.post('/uploadUserGroups', async (req, res) => {
+    if(req.files && req.files.userGroupFile) {
+        try
+        {
+            const filePath = getUploadPath(req.files.userGroupFile, req.companyId);
+            console.log('filePath', filePath);
+            req.files.userGroupFile.mv(filePath, async (error) => {
+                if(error)
+                {
+                    console.error('User Groups File upload save error - ', error);
+                    res.status(500).send("Could not save file - " + error);
+                }
+                try
+                {
+                    let tableName = 'stg.temp_import_' + moment().unix();
+                    let createQuery = `create table ${tableName} (personcode varchar(200), grouptype varchar(50), groupcode varchar(35), groupname varchar(150), startdate date)`;
+                    console.log('createQuery',createQuery);
+                    let createRes =await db.executeQuery(createQuery, []);
+                    console.log(createRes);
+
+                    let copyRes = await copyService.copyFileIntoDB(filePath, tableName);
+
+                    // let deleteQuery = await db.executeQuery('drop table if exists ' + tableName);
+                    res.send({'uploaded':'uploaded'})
+                }
+                catch(copyError)
+                {
+                    console.error('Could not save User Group File information', copyError);
+                    res.status(500).send("Could not save User Group File information")
+                }
+            })
+        }
+        catch(error)
+        {
+            console.error('Could not upload user group info', error)
         }
     }
     else

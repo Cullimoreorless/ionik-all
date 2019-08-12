@@ -13,6 +13,7 @@ const adminController = require('./controllers/admin.controller');
 const companyController = require('./controllers/company.controller');
 const systemController = require('./controllers/system.controller');
 const companyAdminController = require('./controllers/company-admin.controller');
+const metricController = require('./controllers/metric.controller');
 
 
 const path = require('path')
@@ -92,6 +93,7 @@ app.use('/system', systemController);
 app.use('/auth', authController); 
 app.use('/admin', adminController);
 app.use('/companyAdmin', companyAdminController);
+app.use('/metrics', metricController);
 
 app.listen(port, () => {
   console.log(`Siamo Web App listening on port ${port}`)
