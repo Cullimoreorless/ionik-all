@@ -153,9 +153,7 @@ router.post('/uploadUserGroups', async (req, res) => {
                 {
                     let tableName = 'stg.temp_import_' + moment().unix();
                     let createQuery = `create table ${tableName} (personcode varchar(200), grouptype varchar(50), groupcode varchar(35), groupname varchar(150), startdate date)`;
-                    console.log('createQuery',createQuery);
                     let createRes =await db.executeQuery(createQuery, []);
-                    console.log(createRes);
 
                     let copyRes = await copyService.copyFileIntoDB(filePath, tableName);
 
