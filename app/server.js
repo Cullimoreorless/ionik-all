@@ -24,7 +24,8 @@ const dbConn = {
   host:process.env.IONIKDBHOST,
   database:process.env.IONIKDBDATABASE,
   port:process.env.IONIKDBPORT
-}; 
+};
+const db = require('./db/db.service');
 
 
 const app = express();
@@ -94,6 +95,43 @@ app.use('/auth', authController);
 app.use('/admin', adminController);
 app.use('/companyAdmin', companyAdminController);
 app.use('/metrics', metricController);
+
+
+const {ApolloServer, gql} = require('apollo-server-express');
+const typeDefs = gql`
+  type Query {
+    name: String
+  }`;
+
+const schema = require('./graphql-config/schema');
+
+const root = {
+  name:() => 'Siamo is awesome!!',
+  ...schema.resolvers
+};
+
+const resolvers = {
+  Query: root,
+  ...schema.typeResolvers
+};
+const context = async({req, res}) => {
+  console.log('context req',req.companyId);
+  if(!req.companyId)
+  {
+    res.status(403).send({message:"Not Authorized"})
+  }
+
+  return {
+    db:{
+      query: db.executeQuery
+    },
+    cid:req.companyId
+  };
+};
+
+const server = new ApolloServer({ typeDefs:[typeDefs, ...schema.types], resolvers, context});
+
+server.applyMiddleware({app});
 
 app.listen(port, () => {
   console.log(`Siamo Web App listening on port ${port}`)
