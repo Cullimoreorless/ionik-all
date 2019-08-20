@@ -17,7 +17,7 @@ module.exports = {
         firstName:String,
         lastName:String,
         gender: String,
-        email: String.
+        email: String,
         birthDay:String, 
         locationName:String,
         groups: [Group]

@@ -26,6 +26,7 @@ module.exports = {
         sentOutOfWorkHours: Boolean 
     }
     extend type Query {
+        message:Message
         messages:[Message]!
     }`,
     typeResolver:{
@@ -34,7 +35,7 @@ module.exports = {
                 return await getPersonById({senderId}, {id:senderId}, ctx);
             },
             recipient: async ({recipientId}, args, ctx) => {
-                return await getPersonById({recipientId}, {id:recipientId},ctx);
+                return await getPersonById({recipientId}, {id:recipientId}, ctx);
             },
             messageId: async({messageId}) => messageId,
             totalNumberOfRecipients: async({totalNumberOfRecipients }) => totalNumberOfRecipients,

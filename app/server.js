@@ -116,11 +116,11 @@ const resolvers = {
 };
 const context = async({req, res}) => {
   console.log('context req',req.companyId);
-  if(!req.companyId)
-  {
-    res.status(403).send({message:"Not Authorized"})
-  }
-
+  // if(!req.companyId)
+  // {
+  //   res.status(403).send({message:"Not Authorized"})
+  // }
+  req.companyId = 2;
   return {
     db:{
       query: db.executeQuery

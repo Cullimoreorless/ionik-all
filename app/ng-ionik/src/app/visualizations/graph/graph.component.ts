@@ -108,7 +108,7 @@ export class GraphComponent implements OnInit {
     this.links.forEach(link => {
       link.source = this.nodes.find(n => n.id == link.source);
       link.target = this.nodes.find(n => n.id == link.target);    
-    })
+    });
     
     let sim = d3.forceSimulation(this.nodes)
       .force('link',d3.forceLink().distance(200).links(this.links))
