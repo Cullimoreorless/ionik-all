@@ -4,6 +4,9 @@ const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
 const fileUpload = require('express-fileupload');
 
+
+const middleware = require('./middleware/auth.middleware');
+
 const graphController = require('./graph/graph.controller');
 // const userController = require('./user/user.controller')
 const authController = require('./controllers/auth.controller');
@@ -46,6 +49,7 @@ const identifierMiddleware = async (req, res, next) => {
     }
     catch(err){
       console.error(`Could not decode JWT - ${err.message}`)
+      // res.status(403).send({'message':'Unauthorized'})
     }
   }
   next();
@@ -87,13 +91,13 @@ const port = process.env.PORT ||3000;
 
 app.use(express.static(path.join(__dirname, "public")))
 
-app.use("/molecule", graphController); 
+app.use("/molecule", graphController);
 // app.user("/user",userController)
-app.use('/company', companyController);
-app.use('/system', systemController);
+app.use('/company', middleware.identifierMiddleware, middleware.checkForRole('SystemAdmin'), companyController);
+app.use('/system', middleware.identifierMiddleware, systemController);
 app.use('/auth', authController); 
-app.use('/admin', adminController);
-app.use('/companyAdmin', companyAdminController);
+app.use('/admin', middleware.identifierMiddleware, middleware.checkForRole('SystemAdmin'), adminController);
+app.use('/companyAdmin', middleware.identifierMiddleware, middleware.checkForRole('CompanyAdmin'), companyAdminController);
 app.use('/metrics', metricController);
 
 

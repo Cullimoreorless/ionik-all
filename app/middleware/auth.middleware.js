@@ -13,6 +13,7 @@ const identifierMiddleware = async (req, res, next) => {
         }
         catch(err){
             console.error(`Could not decode JWT - ${err.message}`)
+            res.status(403).send({"message":"Unauthorized"})
         }
     }
     next();

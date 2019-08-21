@@ -2,9 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const adminService = require('../db/admin.service');
-const middleware = require('../middleware/auth.middleware');
 
-router.use(middleware.checkForRole('SystemAdmin'));
+// router.use(middleware.checkForRole('SystemAdmin'));
 
 router.get('/getCompanies', async(req, res) => {
     const companies = await adminService.getCompanies();
