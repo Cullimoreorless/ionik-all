@@ -98,7 +98,7 @@ app.use('/system', middleware.identifierMiddleware, systemController);
 app.use('/auth', authController); 
 app.use('/admin', middleware.identifierMiddleware, middleware.checkForRole('SystemAdmin'), adminController);
 app.use('/companyAdmin', middleware.identifierMiddleware, middleware.checkForRole('CompanyAdmin'), companyAdminController);
-app.use('/metrics', metricController);
+app.use('/metrics',middleware.identifierMiddleware, middleware.mustHaveCompany, metricController);
 
 
 const {ApolloServer, gql} = require('apollo-server-express');

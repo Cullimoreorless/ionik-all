@@ -28,14 +28,12 @@ const groupingAttributes = {
 };
 
 const getBaseQuery = (groupingKey, groupName, colorKey) => {
-    console.log(groupingKey, colorKey)
     if(!['location','person','group'].includes(groupingKey) || (groupingKey === 'group' && !groupName) ) {
         return null;
     }
 
-    const groupObj = groupingKey == 'group' && groupName ? groupingAttributes['group'](groupName) : groupingAttributes[groupingKey];
+    const groupObj = groupingKey === 'group' && groupName ? groupingAttributes['group'](groupName) : groupingAttributes[groupingKey];
     const colorObj = colorKey ? (['person','location'].includes(colorKey) ? groupingAttributes[colorKey] : groupingAttributes['group'](colorKey) ): groupObj;
-    console.log(groupObj, colorObj);
     return `select
     ${groupObj.sourceId} as sourceid,
     ${groupObj.sourceText} as sourcetext,
@@ -104,9 +102,7 @@ select distinct sourceid, targetid, linkweight from messagedata
 
 router.post('/getMessageData', async(req, res) => {
    try{
-       console.log(req.body);
        let baseQuery = getBaseQuery(req.body.groupingKey, req.body.groupName, req.body.colorKey);
-       console.log(baseQuery);
        let results = await db.executeQuery(graphQuery(baseQuery), {companyId: req.companyId,
                                                                         startDate: req.body.startDate, endDate: req.body.endDate});
        res.send(results[0]);
