@@ -27,7 +27,41 @@ const groupingAttributes = {
     }
 };
 
-const getBaseQuery = (groupingKey, groupName, colorKey) => {
+
+const getGroupingObject = (groupingKey, groupName) =>
+{
+    return groupingKey === 'group' && groupName ? groupingAttributes['group'](groupName) : groupingAttributes[groupingKey];
+};
+
+const getLineQuery = (seriesKey, groupName) => {
+    if(!['location','person','group'].includes(seriesKey) || (seriesKey === 'group' && !groupName) ) {
+        return null;
+    }
+
+    const seriesObj = getGroupingObject(seriesKey, groupName);
+    if(seriesObj)
+    {
+        return `select seriesid, seriesname, 
+         jsonb_agg(jsonb_build_object('x',x,'y',y)) as seriesdata,
+            jsonb_agg(seriesname) over () as serieslabels
+        from (
+        select ${seriesObj.sourceId} as seriesid, 
+            ${seriesObj.sourceText} as seriesname, 
+            sum(weightedmessage) as y, 
+            messagedate as x 
+        from public.vw_all_message_info
+        where companyid = :companyId
+        group by ${seriesObj.sourceId}, ${seriesObj.sourceText}, messagedate
+        ) base 
+        group by seriesid, seriesname order by seriesname`;
+    }
+    else
+    {
+        return null;
+    }
+};
+
+const getBaseNetworkQuery = (groupingKey, groupName, colorKey) => {
     if(!['location','person','group'].includes(groupingKey) || (groupingKey === 'group' && !groupName) ) {
         return null;
     }
@@ -53,28 +87,6 @@ const getBaseQuery = (groupingKey, groupName, colorKey) => {
     ${groupObj.targetText} ${colorKey ? ', ' + [colorObj.sourceId, colorObj.sourceText, colorObj.targetId, colorObj.targetText].join(', ') : ''}`
 };
 
-// select
-// senderid as sourceid,
-// senderfirstname || ' ' || senderlastname as sourcetext,
-// recipientid as targetid,
-// recipientfirstname || ' ' || recipientlastname as targettext,
-// senderlocationcode as sourcecolorid,
-// recipientlocationcode as targetcolorid,
-//     sendergroups#>>'{"Project XXXTeam","groupname"}',
-//     recipientgroups#>>'{"Project Team","groupname"}',
-// sum(weightedmessage) as weightedmessages
-// from public.vw_all_message_info
-// where companyid = :companyId
-// and messagedate >= :startDate and messagedate <= :endDate
-// group by
-// senderid,
-// senderfirstname || ' ' || senderlastname,
-//     recipientid ,
-// recipientfirstname || ' ' || recipientlastname ,
-//     senderlocationcode,
-//     recipientlocationcode,
-//     recipientgroups#>>'{"Project Team","groupname"}',
-//     sendergroups#>>'{"Project XXXTeam","groupname"}'
 
 const graphQuery = (baseQuery) => `with messagedata as (
 select *, 
@@ -102,7 +114,7 @@ select distinct sourceid, targetid, linkweight from messagedata
 
 router.post('/getMessageData', async(req, res) => {
    try{
-       let baseQuery = getBaseQuery(req.body.groupingKey, req.body.groupName, req.body.colorKey);
+       let baseQuery = getBaseNetworkQuery(req.body.groupingKey, req.body.groupName, req.body.colorKey);
        let results = await db.executeQuery(graphQuery(baseQuery), {companyId: req.companyId,
                                                                         startDate: req.body.startDate, endDate: req.body.endDate});
        res.send(results[0]);
@@ -112,6 +124,20 @@ router.post('/getMessageData', async(req, res) => {
        console.error('getMessageData - ', e)
        res.status(500).send({message:'failed to query'})
    }
+});
+
+router.post('/getMessageSenderLineData', async(req, res) => {
+    try {
+        let results = await db.executeQuery(getLineQuery(req.body.seriesKey, req.body.groupName),
+            {companyId:req.companyId});
+
+        res.send(results);
+    }
+    catch(e)
+    {
+        console.error('getMessageSenderLineData - ', e)
+        res.status(500).send({message:'failed to query'})
+    }
 });
 
 module.exports = router;
