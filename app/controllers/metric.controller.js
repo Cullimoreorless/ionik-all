@@ -41,19 +41,15 @@ const getLineQuery = (seriesKey, groupName) => {
     const seriesObj = getGroupingObject(seriesKey, groupName);
     if(seriesObj)
     {
-        return `select seriesid, seriesname, 
-         jsonb_agg(jsonb_build_object('x',x,'y',y)) as seriesdata,
-            jsonb_agg(seriesname) over () as serieslabels
-        from (
+        return `
         select ${seriesObj.sourceId} as seriesid, 
             ${seriesObj.sourceText} as seriesname, 
             sum(weightedmessage) as y, 
             messagedate as x 
         from public.vw_all_message_info
-        where companyid = :companyId
+        where companyid = :companyId and messagedate between :startDate and :endDate
         group by ${seriesObj.sourceId}, ${seriesObj.sourceText}, messagedate
-        ) base 
-        group by seriesid, seriesname order by seriesname`;
+        order by messagedate`;
     }
     else
     {
@@ -85,6 +81,21 @@ const getBaseNetworkQuery = (groupingKey, groupName, colorKey) => {
     ${groupObj.sourceText},
     ${groupObj.targetId},
     ${groupObj.targetText} ${colorKey ? ', ' + [colorObj.sourceId, colorObj.sourceText, colorObj.targetId, colorObj.targetText].join(', ') : ''}`
+};
+
+const getStackedBarQuery = (groupKey, groupName) => {
+    let groupingObj = getGroupingObject(groupKey, groupName);
+    return `select ROUND(100 * (sum(weightedmessage) over (partition by barid, category)/
+                sum(weightedmessage) over (partition by barid)) 
+        ) as y, bartext as x, category from (
+    select ${groupingObj.sourceId} as barid, 
+      ${groupingObj.sourceText} as bartext,
+      case when sentoutofworkhours then 'After Hours' else 'During Business Hours' end as category,
+      sum(weightedmessage) as weightedmessage
+    from public.vw_all_message_info
+    where companyId = :companyId and messagedate between :startDate and :endDate 
+    group by ${groupingObj.sourceId}, ${groupingObj.sourceText}, sentoutofworkhours
+    ) base`
 };
 
 
@@ -129,7 +140,7 @@ router.post('/getMessageData', async(req, res) => {
 router.post('/getMessageSenderLineData', async(req, res) => {
     try {
         let results = await db.executeQuery(getLineQuery(req.body.seriesKey, req.body.groupName),
-            {companyId:req.companyId});
+            {companyId:req.companyId, startDate:req.body.startDate, endDate:req.body.endDate});
 
         res.send(results);
     }
@@ -139,5 +150,19 @@ router.post('/getMessageSenderLineData', async(req, res) => {
         res.status(500).send({message:'failed to query'})
     }
 });
+
+router.post('/getAfterHoursBarData', async(req,res) => {
+    try
+    {
+        let results = await db.executeQuery(getStackedBarQuery(req.body.groupingKey, req.body.groupName),
+            {companyId:req.companyId, startDate:req.body.startDate, endDate:req.body.endDate});
+        res.send(results);
+    }
+    catch(e)
+    {
+        console.error('getAfterHoursBarData - ', e);
+        res.status(500).send({message:'failed to query'})
+    }
+})
 
 module.exports = router;
