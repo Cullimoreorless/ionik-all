@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const CRUDContext = require('./crud.service');
 const userCtx = new CRUDContext('user');
 const db = require('./db.service');
+const fs = require('fs');
 
 const getUserRoleQuery = `select au.userid, jsonb_agg(approlename) as roles
 from app_user au 
@@ -17,14 +18,18 @@ from app_user au
 const addRoleQuery = `insert into app_user_role (userid, approleid)
   VALUES (:userId, (select approleid from app_role where approlename = :roleName limit 1))`;
 
+// console.log('privateKe',privateKey);
+
+
 const generateJWT = (companyId, userId, userRoles, expireDate) => {
+  const privateKey = fs.readFileSync(__dirname + '/../rsakeys/private-siamo.pem');
   let token = jwt.sign({
     cid: companyId,
     uid: userId,
     roles: userRoles,
     expiresAt: expireDate
-  }, process.env.SIAMOCOOKIESECRET,
-  { expiresIn:"2h", subject: userId.toString() });
+  }, {key: privateKey, passphrase:process.env.SIAMOCOOKIESECRET},
+  { expiresIn:"2h", subject: userId.toString(), algorithm:'RS256' });
   return token;
 };
 
@@ -56,7 +61,7 @@ const verifyUser = async (username, password) =>{
 
 const addRole = async (userId, roleName) => {
   let insertRole = await db.executeQuery(addRoleQuery, {userId, roleName});
-  console.log(insertRole);
+  // console.log(insertRole);
   return insertRole;
 }
 

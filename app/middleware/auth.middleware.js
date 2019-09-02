@@ -1,22 +1,25 @@
 
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
+const publicKey = fs.readFileSync(__dirname + '/../rsakeys/public-siamo.pem');
 
 const identifierMiddleware = async (req, res, next) => {
     if(req.headers.authorization){
         let bearerToken = req.headers.authorization.replace('Bearer ','');
         try{
-            let decoded = jwt.verify(bearerToken, process.env.SIAMOCOOKIESECRET);
+            let decoded = jwt.verify(bearerToken, publicKey, {algorithms:['RS256']});
             req.companyId = decoded.cid;
             req.userId = decoded.uid;
             req.roles = decoded.roles;
+            if(decoded.cid) {
+                next();
+            }
         }
         catch(err){
-            console.error(`Could not decode JWT - ${err.message}`)
             res.status(403).send({"message":"Unauthorized"})
         }
     }
-    next();
 };
 
 const checkForRole = (roleName) =>

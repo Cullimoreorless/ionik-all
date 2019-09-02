@@ -38,22 +38,22 @@ app.set('views',path.join(__dirname, "/views"));
 
 
 
-const identifierMiddleware = async (req, res, next) => {
-  if(req.headers.authorization){
-    let bearerToken = req.headers.authorization.replace('Bearer ','');
-    try{
-      let decoded = jwt.verify(bearerToken, process.env.SIAMOCOOKIESECRET);
-      req.companyId = decoded.cid;
-      req.userId = decoded.uid;
-      req.roles = decoded.roles;
-    }
-    catch(err){
-      console.error(`Could not decode JWT - ${err.message}`)
-      // res.status(403).send({'message':'Unauthorized'})
-    }
-  }
-  next();
-};
+// const identifierMiddleware = async (req, res, next) => {
+//   if(req.headers.authorization){
+//     let bearerToken = req.headers.authorization.replace('Bearer ','');
+//     try{
+//       let decoded = jwt.verify(bearerToken, process.env.SIAMOCOOKIESECRET);
+//       req.companyId = decoded.cid;
+//       req.userId = decoded.uid;
+//       req.roles = decoded.roles;
+//     }
+//     catch(err){
+//       console.error(`Could not decode JWT - ${err.message}`)
+//       // res.status(403).send({'message':'Unauthorized'})
+//     }
+//   }
+//   next();
+// };
 
 const mustHaveRoleMiddleware = async (req, res, next, roleName) =>
 {
@@ -77,7 +77,7 @@ const mustHaveCompany = async (req, res, next) => {
   }
 };
 
-app.use(identifierMiddleware);
+// app.use(identifierMiddleware);
 
 app.use(helmet());
 app.use(express.json());

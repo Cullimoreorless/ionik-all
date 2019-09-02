@@ -107,17 +107,22 @@ select *,
   )base )
 select (
 select json_agg(row_to_json(nodes)) as nodes from (
+select nodeid, nodetext, nodecolor, max(nodeweight) as nodeweight
+from (
 select 
   sourceid as nodeid, 
   sourcetext as nodetext,
-  sourcecolorid as nodecolor
+  sourcecolorid as nodecolor,
+  ntile(5) over (order by sendertotalmessages) as nodeweight
 from messagedata
 union 
 select 
   targetid as nodeid, 
   targettext as nodetext,
-  targetcolorid as nodecolor
-from messagedata) nodes) as nodes,
+  targetcolorid as nodecolor,
+  0::int as nodeweight
+from messagedata) basenodes
+ group by nodeid, nodetext, nodecolor) nodes) as nodes,
 (select json_agg(row_to_json(links))
 from (
 select distinct sourceid, targetid, linkweight from messagedata 
