@@ -1,11 +1,25 @@
 const express = require('express');
 const router = express.Router();
+const companyIntegrationsContext = require('./../db/crud-overrides/companyintegrationcontext');
 
 const copyService = require('./../db/copy.service');
 
 const moment = require('moment');
 const fs = require('fs');
 const db = require('../db/db.service');
+
+
+router.get('/listCompanyIntegrations', async (req, res) => {
+    let integrations = await companyIntegrationsContext.getCompanyIntegrationsList(req.companyId);
+    res.send(integrations)
+});
+
+router.get('/getCompanyEmployees', async (req, res) => {
+    let employees = await db.executeQuery(
+        'select personid as id, coalesce(firstname,\'\') || \' \' || coalesce(lastname,\'\') as "fullName" from person_information');
+    res.send(employees);
+});
+
 
 router.get('/getUsers/:companyIntegrationId', async (req, res) => {
     if(req.params.companyIntegrationId)

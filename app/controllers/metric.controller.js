@@ -98,6 +98,27 @@ const getStackedBarQuery = (groupKey, groupName) => {
     ) base`
 };
 
+const getSenderQuery = (groupKey, groupName) => {
+    let groupingObj = getGroupingObject(groupKey, groupName)
+    return `select array_agg(targettext) as labels, array_agg(targetamount) as data
+            from (select ${groupingObj.targetId} as targetid, ${groupingObj.targetText} as targettext,
+                sum(weightedmessage) as targetamount
+            from public.vw_all_message_info
+            where companyId = :companyId and messagedate between :startDate and :endDate
+                and senderid = :senderId
+            group by ${groupingObj.targetId}, ${groupingObj.targetText}) base`;
+};
+const getRecipientQuery = (groupKey, groupName) => {
+    let groupingObj = getGroupingObject(groupKey, groupName)
+    return `select array_agg(targettext) as labels, array_agg(targetamount) as data
+            from (select ${groupingObj.sourceId} as targetid, ${groupingObj.sourceText} as targettext,
+                sum(weightedmessage) as targetamount
+            from public.vw_all_message_info
+            where companyId = :companyId and messagedate between :startDate and :endDate
+                and recipientid = :recipientId
+            group by ${groupingObj.sourceId}, ${groupingObj.sourceText}) base`;
+};
+
 
 const graphQuery = (baseQuery) => `with messagedata as (
 select *, 
@@ -168,6 +189,33 @@ router.post('/getAfterHoursBarData', async(req,res) => {
         console.error('getAfterHoursBarData - ', e);
         res.status(500).send({message:'failed to query'})
     }
-})
+});
+
+router.post('/getSenderData', async (req,res) => {
+    try {
+        console.log('senderReq', req.body)
+        results =  await db.executeQuery(getSenderQuery(req.body.groupingKey, req.body.groupName),
+            {companyId: req.companyId, startDate:req.body.startDate, endDate: req.body.endDate, senderId: req.body.senderId});
+        res.send(results);
+
+    }
+    catch (e) {
+        console.error(`getSenderData - ${e}`);
+        res.status(500).send({message:'failed to query'});
+    }
+});
+
+router.post('/getRecipientData', async (req,res) => {
+    try {
+        results = await db.executeQuery(getRecipientQuery(req.body.groupingKey, req.body.groupName),
+            {companyId: req.companyId, startDate:req.body.startDate, endDate: req.body.endDate, recipientId: req.body.recipientId})
+        res.send(results)
+
+    }
+    catch (e) {
+        console.error(`getRecipientData - ${e}`);
+        res.status(500).send({message:'failed to query'});
+    }
+});
 
 module.exports = router;
