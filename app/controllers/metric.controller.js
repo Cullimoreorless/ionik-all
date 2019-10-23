@@ -99,7 +99,7 @@ const getStackedBarQuery = (groupKey, groupName) => {
 };
 
 const getSenderQuery = (groupKey, groupName) => {
-    let groupingObj = getGroupingObject(groupKey, groupName)
+    let groupingObj = getGroupingObject(groupKey, groupName);
     return `select array_agg(targettext) as labels, array_agg(targetamount) as data
             from (select ${groupingObj.targetId} as targetid, ${groupingObj.targetText} as targettext,
                 sum(weightedmessage) as targetamount
@@ -109,7 +109,7 @@ const getSenderQuery = (groupKey, groupName) => {
             group by ${groupingObj.targetId}, ${groupingObj.targetText}) base`;
 };
 const getRecipientQuery = (groupKey, groupName) => {
-    let groupingObj = getGroupingObject(groupKey, groupName)
+    let groupingObj = getGroupingObject(groupKey, groupName);
     return `select array_agg(targettext) as labels, array_agg(targetamount) as data
             from (select ${groupingObj.sourceId} as targetid, ${groupingObj.sourceText} as targettext,
                 sum(weightedmessage) as targetamount
@@ -201,6 +201,23 @@ router.post('/getSenderData', async (req,res) => {
     }
     catch (e) {
         console.error(`getSenderData - ${e}`);
+        res.status(500).send({message:'failed to query'});
+    }
+});
+
+router.post('/getSenderHoursData', async (req, res) => {
+    try {
+        results = await db.executeQuery(`select case when sentoutofworkhours then 'After Hours' else 'During Business Hours' end as seriesname, 
+                  sum(weightedmessage) as y,
+                  messagedate as x
+                from public.vw_all_message_info
+                where companyid = :companyId and messagedate between :startDate and :endDate and senderid = :senderId
+                group by sentoutofworkhours, messagedate`,
+            {companyId:req.companyId, startDate:req.body.startDate, endDate: req.body.endDate, senderId: req.body.senderId})
+        res.send(results);
+    }
+    catch(e) {
+        console.error('senderHourData - ' + e);
         res.status(500).send({message:'failed to query'});
     }
 });
