@@ -10,19 +10,25 @@ const groupingAttributes = {
         sourceText:`senderfirstname || ' ' || senderlastname`,
         targetId: 'recipientid',
         targetText:`recipientfirstname || ' ' || recipientlastname`,
+        chosenId: 'personid',
+        chosenText: `firstname || ' ' || lastname`
     },
     location: {
         sourceId: 'senderlocationcode',
         sourceText: 'senderlocationname',
         targetId: 'recipientlocationcode',
         targetText: 'recipientlocationname',
+        chosenId: 'locationcode',
+        chosenText: 'locationname',
     },
     group: (groupName) => {
         return {
             sourceId: `coalesce(sendergroups#>>'{"${groupName}","groupcode"}','None')`,
             sourceText: `coalesce(sendergroups#>>'{"${groupName}","groupname"}','None')`,
             targetId: `coalesce(recipientgroups#>>'{"${groupName}","groupcode"}','None')`,
-            targetText: `coalesce(recipientgroups#>>'{"${groupName}","groupname"}','None')`
+            targetText: `coalesce(recipientgroups#>>'{"${groupName}","groupname"}','None')`,
+            chosenId: `coalesce(groups#>>'{"${groupName}","groupcode"}','None')`,
+            chosenText: `coalesce(groups#>>'{"${groupName}","groupname"}','None')`
         }
     }
 };
@@ -154,7 +160,7 @@ router.post('/getMessageData', async(req, res) => {
        let baseQuery = getBaseNetworkQuery(req.body.groupingKey, req.body.groupName, req.body.colorKey);
        let results = await db.executeQuery(graphQuery(baseQuery), {companyId: req.companyId,
                                                                         startDate: req.body.startDate, endDate: req.body.endDate});
-       res.send(results[0]);
+       res.send(results && results[0]);
    }
    catch(e)
    {
@@ -172,7 +178,7 @@ router.post('/getMessageSenderLineData', async(req, res) => {
     }
     catch(e)
     {
-        console.error('getMessageSenderLineData - ', e)
+        console.error('getMessageSenderLineData - ', e);
         res.status(500).send({message:'failed to query'})
     }
 });
@@ -222,6 +228,7 @@ router.post('/getSenderHoursData', async (req, res) => {
     }
 });
 
+
 router.post('/getRecipientData', async (req,res) => {
     try {
         results = await db.executeQuery(getRecipientQuery(req.body.groupingKey, req.body.groupName),
@@ -232,6 +239,63 @@ router.post('/getRecipientData', async (req,res) => {
     catch (e) {
         console.error(`getRecipientData - ${e}`);
         res.status(500).send({message:'failed to query'});
+    }
+});
+
+const getResponseTimes = (groupingObj) => {
+    return `select ${groupingObj.chosenId} as id, ${groupingObj.chosenText} as text, 
+            avg(average_response_time) average_response_time, avg(average_wait_time) average_wait_time
+        from (
+        select pi.*, average_response_time, average_wait_time from 
+        (select coalesce(resp.companyid, waits.companyid) as companyid, 
+          coalesce(resp.personid, waits.personid) as personid, 
+          average_response_time, average_wait_time
+        from (
+        select companyid, personid, avg(least(time_since_last_message, 60)) average_response_time
+        from public.vw_response_times
+        where prevperson <> personid and companyid = :companyId
+          and messagetslocal::date between :startDate and :endDate
+        group by companyid, personid) resp
+        full join 
+        (select companyid, personid, avg(least(time_til_response, 60)) average_wait_time
+        from public.vw_response_times
+        where nextperson <> personid and companyid = :companyId
+          and messagetslocal::date between :startDate and :endDate
+        group by companyid, personid) waits
+         on resp.companyid = waits.companyid 
+           and resp.personid = waits.personid) resp_time
+         join 
+        (select pi.personid, pi.companyid, pi.firstname, pi.lastname, 
+          pi.gender, pi.ethnicity, pi.birthday, 
+          pl.locationcode, pl.locationname, 
+          (('{'::text || string_agg((('"'::text || grouptype::text) || '":'::text) || jsonb_build_object('groupcode', groupcode, 'groupname', groupname)::text, ','::text)) || '}'::text)::jsonb as groups
+        from person_information pi 
+        left join person_location pl 
+          on pl.personid = pi.personid 
+            and pl.companyid = pi.companyid
+            and pi.companyid = :companyId
+            and :endDate between pl.startdate and coalesce(pl.enddate, '3000-01-01')
+        left join person_group pg 
+          on pg.personid = pi.personid
+            and pg.companyid = pi.companyid
+            and pi.companyid = :companyId
+            and :endDate between pg.startdate and coalesce(pg.enddate, '3000-01-01')
+        group by pi.personid, pi.companyid, pi.firstname, pi.lastname, 
+          pi.gender, pi.ethnicity, pi.birthday, 
+          pl.locationcode, pl.locationname) as pi
+          on pi.personid = resp_time.personid and pi.companyid = resp_time.companyid ) base group by ${groupingObj.chosenId}, ${groupingObj.chosenText}`;
+};
+
+router.post('/getResponseTimes', async (req, res) => {
+    try{
+        let groupingObj = getGroupingObject(req.body.groupingKey, req.body.groupName);
+        let results = await db.executeQuery(getResponseTimes(groupingObj),
+            {companyId:req.companyId, startDate:req.body.startDate, endDate:req.body.endDate});
+        res.send(results);
+    }
+    catch(e){
+        console.error(`getResponseTime - ${e}`);
+        res.status(500).send({message:'failed to query'})
     }
 });
 
