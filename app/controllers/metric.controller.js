@@ -299,4 +299,96 @@ router.post('/getResponseTimes', async (req, res) => {
     }
 });
 
+const getTopThreesQuery = (groupingObject) => {
+    return `select metriclabel, metricarray[1:3] from (
+        select metriclabel, array_agg(  src || ' ('||metric||'%)') as metricarray
+        from (
+        select 'Most Active After-Hours ' as MetricLabel, companyid, ${groupingObject.sourceId}, ${groupingObject.sourceText} as src, 
+          100 * round(sum(case when sentoutofworkhours then weightedmessage else 0 end) 
+          / sum(weightedmessage),2) as metric
+        from vw_all_message_info  
+        where companyid = :companyId and messagedate between :startDate and :endDate
+        group by companyid, ${groupingObject.sourceId}, ${groupingObject.sourceText}
+        order by 100 * round(sum(case when sentoutofworkhours then weightedmessage else 0 end) 
+          / sum(weightedmessage),2) desc) base
+        group by metriclabel) base2
+        union 
+        select metriclabel, metricarray[1:3] from (
+        select metriclabel, array_agg(src || ' (score: '||metric||')') as metricarray
+        from (
+        select 'Most Active Overall' as MetricLabel, companyid, ${groupingObject.sourceId}, ${groupingObject.sourceText} as src, 
+          round(sum(weightedmessage),2) as metric
+        from vw_all_message_info    
+        where companyid = :companyId and messagedate between :startDate and :endDate
+        group by companyid, ${groupingObject.sourceId}, ${groupingObject.sourceText}
+        order by sum(weightedmessage) desc) base
+        group by metriclabel) base2
+        union
+        select metriclabel, metricarray[1:3] from (
+        select metriclabel, array_agg(src || ' (score: '||metric||')') as metricarray
+        from (
+        select 'Least Active Overall' as MetricLabel, companyid, ${groupingObject.sourceId}, ${groupingObject.sourceText} as src, 
+          round(sum(weightedmessage),2) as metric
+        from vw_all_message_info    
+        where companyid = :companyId and messagedate between :startDate and :endDate
+        group by companyid, ${groupingObject.sourceId}, ${groupingObject.sourceText}
+        order by sum(weightedmessage) asc) base
+        group by metriclabel) base2
+        union
+        select metriclabel, metricarray[1:3] from (
+        select metriclabel, array_agg(src || ' (avg '||metric||' min)') as metricarray
+        from (
+        select 'Quickest Response Time' as metriclabel, companyid, ${groupingObject.chosenId}, ${groupingObject.chosenText} as src, 
+          round(avg(average_response_time),2) as metric
+        from public.get_response_time_overall(:companyId, :startDate::date,:endDate::date)
+        group by companyid, ${groupingObject.chosenId}, ${groupingObject.chosenText}
+        order by avg(average_response_time) asc) base
+        group by metriclabel) base2
+        union
+        select metriclabel, metricarray[1:3] from (
+        select metriclabel, array_agg(src || ' (avg '||metric||' min)') as metricarray
+        from (
+        select 'Longest Response Time' as metriclabel, companyid, ${groupingObject.chosenId}, ${groupingObject.chosenText} as src, 
+          round(avg(average_response_time),2) as metric
+        from public.get_response_time_overall(:companyId, :startDate::date,:endDate::date)
+        group by companyid, ${groupingObject.chosenId}, ${groupingObject.chosenText}
+        order by avg(average_response_time) desc) base
+        group by metriclabel) base2
+        union
+        select metriclabel, metricarray[1:3] from (
+        select metriclabel, array_agg(src|| ' (avg '||metric||' min)') as metricarray
+        from (
+        select 'Shortest Wait for Response' as metriclabel, companyid, ${groupingObject.chosenId}, ${groupingObject.chosenText} as src, 
+          round(avg(average_wait_time),2) as metric
+        from public.get_response_time_overall(:companyId, :startDate::date,:endDate::date)
+        group by companyid, ${groupingObject.chosenId}, ${groupingObject.chosenText}
+        order by avg(average_response_time) asc) base
+        group by metriclabel) base2
+        union
+        select metriclabel, metricarray[1:3] from (
+        select metriclabel, array_agg(src || ' (avg '||metric||' min)') as metricarray
+        from (
+        select 'Longest Wait for Response' as metriclabel, companyid, ${groupingObject.chosenId}, ${groupingObject.chosenText} as src, 
+          round(avg(average_wait_time),2) as metric
+        from public.get_response_time_overall(:companyId, :startDate::date,:endDate::date)
+        group by companyid, ${groupingObject.chosenId}, ${groupingObject.chosenText}
+        order by avg(average_response_time) desc) base
+        group by metriclabel) base2`;
+
+};
+
+router.post('/getCompanyTopThrees', async(req, res) => {
+    try{
+        let groupingObj = getGroupingObject(req.body.groupingKey, req.body.groupName);
+        let results = await db.executeQuery(getTopThreesQuery(groupingObj),
+            {companyId:req.companyId, startDate:req.body.startDate, endDate:req.body.endDate});
+        res.send(results);
+    }
+    catch(e){
+        console.error(`getResponseTime - ${e}`);
+        res.status(500).send({message:'failed to query'})
+    }
+
+});
+
 module.exports = router;
