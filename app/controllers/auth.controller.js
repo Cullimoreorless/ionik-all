@@ -47,7 +47,9 @@ router.post('/registerUser', async (req, res) => {
     }
     else
     {
-      authService.addRole(newUser.userid, 'SystemAdmin');
+      if(!authService.sysAdminExists()) {
+        authService.addRole(newUser.userid, 'SystemAdmin');
+      }
     }
   }
 

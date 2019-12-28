@@ -19,7 +19,7 @@ const companyAdminController = require('./controllers/company-admin.controller')
 const metricController = require('./controllers/metric.controller');
 
 
-const path = require('path')
+const path = require('path');
 
 const dbConn = {
   user:process.env.IONIKDBUSER,
