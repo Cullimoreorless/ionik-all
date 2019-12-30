@@ -76,7 +76,7 @@ const getUserRoles = async (userId) =>
 };
 
 const sysAdminExists = async() => {
-  let result = await db.executeQuery(`select count(*) as sysadmincount from app_user_role where approlename = 'SystemAdmin' `,{});
+  let result = await db.executeQuery(`select count(*) as sysadmincount from app_user_role where approleid = (select approleid from app_role where approlename = 'SystemAdmin' limit 1) `,{});
   return result && result[0] && result[0]["sysadmincount"]
 };
 
