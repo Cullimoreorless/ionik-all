@@ -3,7 +3,7 @@ const express = require("express");
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
 const fileUpload = require('express-fileupload');
-
+const cors = require('cors');
 
 const middleware = require('./middleware/auth.middleware');
 
@@ -80,6 +80,7 @@ const mustHaveCompany = async (req, res, next) => {
 // app.use(identifierMiddleware);
 
 app.use(helmet());
+app.use(cors());
 app.use(express.json());
 app.use(fileUpload({
   limits:{ fileSize: 50 * 1024 * 1024 },
@@ -89,7 +90,7 @@ app.use(fileUpload({
 }));
 const port = process.env.PORT ||3000;
 
-app.use(express.static(path.join(__dirname, "public")))
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/molecule", graphController);
 // app.user("/user",userController)
