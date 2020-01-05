@@ -8,9 +8,7 @@ const identifierMiddleware = async (req, res, next) => {
     if(req.headers.authorization){
         let bearerToken = req.headers.authorization.replace('Bearer ','');
         try{
-            console.log('identifier', __dirname + '/../rsakeys/public-siamo.pem', bearerToken);
             let decoded = jwt.verify(bearerToken, publicKey, {algorithms:['RS256']});
-            console.log('done decoding')
             req.companyId = decoded.cid;
             req.userId = decoded.uid;
             req.roles = decoded.roles;
