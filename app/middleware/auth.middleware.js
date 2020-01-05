@@ -13,6 +13,7 @@ const identifierMiddleware = async (req, res, next) => {
             req.companyId = decoded.cid;
             req.userId = decoded.uid;
             req.roles = decoded.roles;
+            console.log(decoded);
             if(decoded.cid || decoded.roles.includes("SystemAdmin")) {
                 console.log('passed identifier');
                 next();
