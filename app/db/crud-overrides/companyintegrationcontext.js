@@ -6,10 +6,7 @@ let CompanyIntegrationContext = new CRUDContext('companyIntegration');
 
 let getCompanyIntegrationsList = async (companyId) =>{
   try{
-    let query = `select companyintegrationid, integrationidentifier, systemtypedesc from company_integration cit 
-    join system_type st 
-      on st.systemtypeid = cit.systemtypeid
-  where systemid is not null and cit.companyid = :companyId;`
+    let query = `select * from vw_company_integrations_list where companyid = :companyId;`;
     let list = await DBHelper.executeQuery(query, { "companyId": companyId});
     return list;
   }

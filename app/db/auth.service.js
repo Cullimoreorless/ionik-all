@@ -63,7 +63,7 @@ const addRole = async (userId, roleName) => {
   let insertRole = await db.executeQuery(addRoleQuery, {userId, roleName});
   // console.log(insertRole);
   return insertRole;
-}
+};
 
 const getUserRoles = async (userId) =>
 {
