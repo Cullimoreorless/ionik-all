@@ -8,3 +8,4 @@ slack/package-lock.json
 **/.idea
 **/uploads/**
 **/rsakeys/**
+**/*.sh

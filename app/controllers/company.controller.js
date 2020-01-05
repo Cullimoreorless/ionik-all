@@ -13,6 +13,7 @@ router.get('/getCompany', async (req,res) => {
 });
 
 router.post('/saveCompany', async (req, res) =>{
+  console.log('saving company', req.body)
   let upsertedCompany = await companyService.upsertCompany(req.body);
   res.send( upsertedCompany )
 });
@@ -61,7 +62,9 @@ let companyService = {
   upsertCompany: async (companyDetails) =>{
     let result = null;
     try{
+      console.log('upserting');
       result = await companyContext.upsert(companyDetails)
+      console.log('upserted result', result);
     }
     catch(err){
       console.error(err);
