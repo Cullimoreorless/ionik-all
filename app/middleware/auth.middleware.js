@@ -12,7 +12,7 @@ const identifierMiddleware = async (req, res, next) => {
             req.companyId = decoded.cid;
             req.userId = decoded.uid;
             req.roles = decoded.roles;
-            if(decoded.cid) {
+            if(decoded.cid || decoded.roles.includes("SystemAdmin")) {
                 next();
             }
         }
