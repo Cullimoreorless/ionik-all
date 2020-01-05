@@ -98,6 +98,7 @@ router.post('/uploadUsers', async (req, res) => {
                 }
                 try {
                     let copyRes = await copyService.copyFileIntoDB(fullPathWithFile, 'stg.stg_demographic_information');
+                    console.log(copyRes);
                     db.executeQuery("select public.update_demographic_information();",[]);
                 }
                 catch(error){

@@ -8,6 +8,7 @@ const dbConn = {
 };
 const copyTo = require('pg-copy-streams').to;
 const copyFrom = require('pg-copy-streams').from;
+const fs = require('fs');
 
 const pool = new Pool(dbConn);
 
@@ -31,10 +32,21 @@ const copyFileIntoDB = async (filePath, tableName) => {
             if(err){
                 reject(err);
             }
-            const copier = copyFrom(`copy ${tableName} from '${filePath}' with csv header;`);
-            copier.cb_flush = () => {};
-            let copyResult = client.query(copier);
-            resolve(copyResult);
+            const copyStream = client.query(copyFrom(`copy ${tableName} from STDIN csv header;`));
+            const fileStream = fs.createReadStream(filePath);
+            const res = fileStream.pipe(copyStream);
+            console.log(res);
+            copyStream.on('error', () => {
+                reject(false);
+            });
+            copyStream.on('end', () => {
+                resolve(true);
+            });
+
+            // const copier = copyFrom(`copy ${tableName} from '${filePath}' with csv header;`);
+            // copier.cb_flush = () => {};
+            // let copyResult = client.query(copier);
+            // resolve(copyResult);
         })
     })
 };
