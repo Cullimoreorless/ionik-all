@@ -9,3 +9,4 @@ slack/package-lock.json
 **/uploads/**
 **/rsakeys/**
 **/*.sh
+**/.aws-sam

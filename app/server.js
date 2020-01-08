@@ -138,7 +138,9 @@ const server = new ApolloServer({ typeDefs:[typeDefs, ...schema.types], resolver
 
 server.applyMiddleware({app});
 
-app.listen(port, () => {
-  console.log(`Siamo Web App listening on port ${port}`)
-});
+exports.app = app;
+
+// app.listen(port, () => {
+//   console.log(`Siamo Web App listening on port ${port}`)
+// });
 

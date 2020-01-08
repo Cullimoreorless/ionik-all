@@ -19,11 +19,13 @@
   "license": "ISC",
   "dependencies": {
     "apollo-server-express": "^2.8.1",
+    "aws-serverless-express": "^3.3.6",
     "bcrypt": "^3.0.6",
     "cors": "^2.8.5",
     "dotenv": "^6.2.0",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
+    "express-fileupload": "^1.1.6",
     "fs": "^0.0.1-security",
     "graphql": "^14.4.2",
     "helmet": "^3.15.0",
